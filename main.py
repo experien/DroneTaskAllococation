@@ -1,11 +1,9 @@
-# TODO: (우선)
-#   2. Evaluator 구현(에너지 모델? 거리?)
-#   3. OPT 구현
-#   4. MA 구현
-
-# TODO: (앞에거 부터 하고 나서)
-#   1. GeneticSolver GA 마저 만들기
-#   2. 환경설정 저장하고 불러오기
+# TODO List:
+#   - Evaluator 구현(에너지 모델? 거리?)
+#   - OPT 구현
+#   - MA 구현
+#   - GeneticSolver GA 마저 만들기
+#   - 환경설정 저장하고 불러오기
 
 # # ======================================================================================================
 # import ma
@@ -45,4 +43,6 @@ genetic_params = GeneticSolverParameters(
 solver = StupidSolver(topology, allocator)
 
 best_solution = solver.solve()
-Visualizer.draw('', topology, best_solution)
+best_score = best_solution.evaluate()
+title = 'best solution({:.3f})'.format(best_score)
+Visualizer.draw(title, topology, best_solution)

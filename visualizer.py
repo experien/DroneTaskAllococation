@@ -12,6 +12,7 @@ class Visualizer:
         cls.topology = topology
         cls.solution = solution
 
+        plt.title(title)
         cls._draw_topology()
         if solution:
             cls._draw_solution()
