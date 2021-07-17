@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from random import shuffle
 
 
-# singleton은 아니지만 singleton이라고 생각하셈
 class Solver(metaclass=ABCMeta):
     # main loops and operations to solve the JOAR problem
 
@@ -32,17 +31,18 @@ class StupidSolver(Solver):
         for _ in range(size):
             solutions.append(self.allocator.allocate_workflows())
 
+        best_solution = max(solutions, key=lambda s: s.evaluate())
+
         if DEBUG:
-            print(f"[DBG] Stupid solution s(size {size}): ")
+            print(f"[DBG] StupidSolver: {size} solutions: ")
             for solution in solutions:
                 solution.print_allocation()
 
-            print()
-
+            print(f"[DBG] StupidSolver: {size} evaluations: ")
             for solution in solutions:
-                print('      ', solution)
+                print('      ', solution, '(BEST)' if solution == best_solution else '')
 
-        return max(solutions, key=lambda s: s.evaluate())
+        return best_solution
 
     def re_solve(self):
         pass

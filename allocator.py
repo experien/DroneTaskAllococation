@@ -3,16 +3,17 @@ from solution import *
 from random import shuffle
 
 
-# singleton은 아니지만 singleton이라고 생각하셈
 class Allocator(metaclass=ABCMeta):
     # initially allocates workflows & their tasks to the given topology
 
     def __init__(self, topology, evaluator):
         self.topology = topology
-        self.solution = Solution(self.topology, evaluator)
+        self.evaluator = evaluator
+        self.solution = None
 
     @abstractmethod
     def allocate_workflows(self):
+        self.solution = Solution(self.topology, self.evaluator)
         return self.solution
 
 
@@ -20,13 +21,12 @@ class GreedyAllocator(Allocator):
     # Greedy+DFS
 
     def allocate_workflows(self):
+        self.solution = Solution(self.topology, self.evaluator)
+
         for wf in self.topology.workflows:
             for start_node in self.topology.all_nodes:
                 if self._alloc_wf_tasks(wf.tasks[:], None, start_node):
                     break
-
-        if DEBUG:
-            self.solution.print_allocation()
 
         return self.solution
 
@@ -49,6 +49,8 @@ class GreedyAllocator(Allocator):
 
 class RandomAllocator(GreedyAllocator):
     def allocate_workflows(self):
+        self.solution = Solution(self.topology, self.evaluator)
+
         for wf in self.topology.workflows:
             start_nodes = self.topology.all_nodes[:]
             shuffle(start_nodes)
@@ -56,9 +58,6 @@ class RandomAllocator(GreedyAllocator):
             for start_node in start_nodes:
                 if self._alloc_wf_tasks(wf.tasks[:], None, start_node):
                     break
-
-        if DEBUG:
-            self.solution.print_allocation()
 
         return self.solution
 

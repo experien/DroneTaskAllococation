@@ -8,6 +8,7 @@ class Solution:
     # Assumption: it n tasks exist in a workflow, these tasks should be allocated to n nodes
     #             i.e. multiple tasks can be assigned to a single node, however,
     #             2 tasks cannot be assigned to a node if they belong to a workflow together
+
     topology = None
     evaluator = None
 
@@ -24,6 +25,8 @@ class Solution:
             else:
                 self.evaluator = Solution.evaluator
 
+            # CAUTION: these data structures should be synchronized
+            #          they are different views of a single logical state
             self.wf_alloc = {wf: False for wf in topology.workflows}
             self.wf_to_node = {wf: {} for wf in topology.workflows}
             self.task_to_node = {}  # n to 1
@@ -86,6 +89,9 @@ class Solution:
     @property
     def workflow_alloc_cnt(self):
         return sum(self.wf_alloc.values())
+
+    def assigned_nodes(self, workflow):
+        return list(self.wf_to_node[workflow].keys())
 
     def evaluate(self):
         if self.require_evaluation:

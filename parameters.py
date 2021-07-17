@@ -16,7 +16,7 @@ class Range(NamedTuple):
         return self.stop - self.start
 
     def __add__(self, other: int):
-            return Range(self.start + other, self.stop + other)
+            return Range(self.stop, self.stop + other)
 
 
 ''' 가시화를 위한 영역 범위 '''
@@ -28,7 +28,8 @@ EdgeServerXRange = DroneXRange + 40
 CloudServerXRange = EdgeServerXRange + 60
 # 전체 영역 너비, 높이
 AreaXRange = Range(DroneXRange.start, CloudServerXRange.stop)
-AreaYRange = Range(0, 100)
+
+AreaYRange = DroneYRange = EdgeServerYRange = CloudServerYRange = Range(0, 100)
 
 ''' 통신 반경 파라미터 '''
 DroneTransRange = 30  # 드론의 통신 반경 (기본: 100)
