@@ -5,7 +5,7 @@ class Solution:
     # mapping information for all the workflows, tasks <--> nodes
     # I used both terms, 'assign' and 'map' to represent task-to-node assignment
     #
-    # Assumption: it n tasks exist in a workflow, these tasks should be allocated to n nodes
+    # Assumption: if n tasks exist in a workflow, these tasks should be allocated to n nodes
     #             i.e. multiple tasks can be assigned to a single node, however,
     #             2 tasks cannot be assigned to a node if they belong to a workflow together
 
@@ -100,6 +100,7 @@ class Solution:
     def evaluate(self):
         if self.require_evaluation:
             self.value = self.evaluator.evaluate(self)
+            self.require_evaluation = False
 
         return self.value
 
