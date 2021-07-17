@@ -9,10 +9,14 @@ class Solution:
     #             i.e. multiple tasks can be assigned to a single node, however,
     #             2 tasks cannot be assigned to a node if they belong to a workflow together
 
+    id_base = 0
     topology = None
     evaluator = None
 
     def __init__(self, topology=None, evaluator=None, base_solution=None):
+        Solution.id_base += 1
+        self.id = Solution.id_base
+
         if not base_solution:
             # remember previous arguments for parameters 'topology' and 'evaluator'
             if topology:
@@ -103,7 +107,7 @@ class Solution:
         return str(self.evaluate())
 
     def print_allocation(self):
-        print(f"[DBG] {self.workflow_alloc_cnt} of {NumOfWorkflows} workflows are fully allocated")
+        print(f"[DBG] Solution#{self.id}: {self.workflow_alloc_cnt} of {NumOfWorkflows} workflows are fully allocated")
         print("      WorkFlow#id(# of tasks) : [target node1, target node2, ...]")
         print()
         for wf in self.topology.workflows:

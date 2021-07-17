@@ -28,7 +28,7 @@ class StupidSolver(Solver):
         for _ in range(size):
             solutions.append(self.allocator.allocate_workflows())
 
-        best_solution = max(solutions, key=lambda s: s.evaluate())
+        best_solution = min(solutions, key=lambda s: s.evaluate())
 
         if DEBUG:
             print(f"[DBG] StupidSolver: {size} solutions: ")

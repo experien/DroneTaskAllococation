@@ -5,6 +5,7 @@ from random import shuffle
 
 class Allocator(metaclass=ABCMeta):
     # initially allocates workflows & their tasks to the given topology
+    # returns 'a' solution
 
     def __init__(self, topology, evaluator):
         self.topology = topology
@@ -47,7 +48,7 @@ class GreedyAllocator(Allocator):
         return False
 
 
-class RandomAllocator(GreedyAllocator):
+class RandomAllocator(Allocator):
     def allocate_workflows(self):
         self.solution = Solution(self.topology, self.evaluator)
 
@@ -78,3 +79,16 @@ class RandomAllocator(GreedyAllocator):
 
         self.solution.unmap(tasks[0])
         return False
+
+
+class OptimalAllocator(Allocator):
+    # completely searches the problem space in the given topology
+    # returns the best solution among the all possible assignments
+
+    def allocate_workflows(self):
+        self.solution = Solution(self.topology, self.evaluator)
+
+        for wf in self.topology.workflows:
+            pass
+
+        return self.solution
