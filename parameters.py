@@ -1,13 +1,40 @@
-SizeOfMonitoringArea = 100  # 드론이 모니터링하는 영역의 크기 (기본: 100)
+from typing import NamedTuple
+import math
 
-''' 에지 서버 영역 파라미터 '''
-EdgeServerArea = 40  # 가시화를 위한 에지 서버 배치 영역의 크기 (기본: 40)
 
-''' 클라우드 서버 영역 파라미터 '''
-CloudServerArea = 60  # 가시화를 위한 클라우드 서버 배치 영역의 크기 (기본: 60)
+DEBUG = True
 
-''' 드론의 통신 반경 파라미터 '''
-TransRangeOfDrone = 30  # 드론의 통신 반경 (기본: 100)
+
+class Range(NamedTuple):
+    # [start, stop)
+    start: int
+    stop: int
+
+    @property
+    def width(self):
+        assert self.start <= self.stop
+        return self.stop - self.start
+
+    def __add__(self, other: int):
+            return Range(self.start + other, self.stop + other)
+
+
+''' 가시화를 위한 영역 범위 '''
+# 드론이 모니터링하는 영역의 x축 범위 (기본: 0 이상 100 미만)
+DroneXRange = Range(0, 100)
+# 에지 서버 배치 영역의 x축 범위 (기본: 100 이상 140 미만)
+EdgeServerXRange = DroneXRange + 40
+# 클라우드 서버 배치 영역의 x축 범위 (기본: 140 이상 200 미만)
+CloudServerXRange = EdgeServerXRange + 60
+# 전체 영역 너비, 높이
+AreaXRange = Range(DroneXRange.start, CloudServerXRange.stop)
+AreaYRange = Range(0, 100)
+
+''' 통신 반경 파라미터 '''
+DroneTransRange = 30  # 드론의 통신 반경 (기본: 100)
+EdgeServerTransRange = math.inf
+CloudServerTransRange = math.inf
+
 
 ''' 네트워크 토폴리지의 드론, 에지 서버, 클라우드 서버의 수 '''
 NumOfDrones = 30  # UAV의 수 (기본: 30)
@@ -38,25 +65,25 @@ MaxRequiredProcessingPower = 30  # 각 태스크의 최대 소모 프로세싱 �
 MinRequiredBandwidth = 20  # 각 태스크의 최소 대역폭 파워 (기본: 50)
 MaxRequiredBandwidth = 30  # 각 태스크의 최대 대역폭 파워 (기본: 200)
 
-NodeXPositions = [0, ]  # 그래프로 각 노드 위치를 표기하기 위한 X좌표 배열
-NodeYPositions = [0, ]  # 그래프로 각 노드 위치를 표기하기 위한 Y좌표 배열
-
-MAX_MATRIX_INDEX = NumOfDrones + NumOfEdgeServer + NumOfCloudServer  # 네트워크 연결 정보 저장 테이블의 최대 인덱스
-
-ConnectionInfo = [[0 for _ in range(MAX_MATRIX_INDEX + 1)] for __ in range(MAX_MATRIX_INDEX + 1)]  # 네트워크 연결 정보 초기화
-
-NodePositionInfo = [(0, 0), ]  # 드론, 에지서버, 클라우드 서버의 위치 정보 저장
-
-ProcessingRateOfDEC = [0, ]  # 각 드론, 에지서버, 클라우드 서버의 프로세싱 rate 저장
-
-DelayFactorOfDEC = [0, ]  # 각 드론, 에지서버, 클라우드 서버의 딜레이 factor 저장
-
-BandwidthOfDEC = [0, ]  # 각 드론, 에지서버, 클라우서버의 대역폭 저장
-
-WorkflowInfo = [0, ]  # sequential 워크플로우 정보 저장 [(태스크 번호, 프로세싱 요구량, 대역폭요구량), ...]
-
-DeployedStatusOfWorkflows = [0, ]  # 각 워크플로우의 배치 여부
-
-
-# ==============================================
-MA_MAX_ITERATION = 100
+# NodeXPositions = [0, ]  # 그래프로 각 노드 위치를 표기하기 위한 X좌표 배열
+# NodeYPositions = [0, ]  # 그래프로 각 노드 위치를 표기하기 위한 Y좌표 배열
+#
+# MAX_MATRIX_INDEX = NumOfDrones + NumOfEdgeServer + NumOfCloudServer  # 네트워크 연결 정보 저장 테이블의 최대 인덱스
+#
+# ConnectionInfo = [[0 for _ in range(MAX_MATRIX_INDEX + 1)] for __ in range(MAX_MATRIX_INDEX + 1)]  # 네트워크 연결 정보 초기화
+#
+# NodePositionInfo = [(0, 0), ]  # 드론, 에지서버, 클라우드 서버의 위치 정보 저장
+#
+# ProcessingRateOfDEC = [0, ]  # 각 드론, 에지서버, 클라우드 서버의 프로세싱 rate 저장
+#
+# DelayFactorOfDEC = [0, ]  # 각 드론, 에지서버, 클라우드 서버의 딜레이 factor 저장
+#
+# BandwidthOfDEC = [0, ]  # 각 드론, 에지서버, 클라우서버의 대역폭 저장
+#
+# WorkflowInfo = [0, ]  # sequential 워크플로우 정보 저장 [(태스크 번호, 프로세싱 요구량, 대역폭요구량), ...]
+#
+# DeployedStatusOfWorkflows = [0, ]  # 각 워크플로우의 배치 여부
+#
+#
+# # ==============================================
+# MA_MAX_ITERATION = 100

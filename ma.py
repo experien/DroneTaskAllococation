@@ -1,12 +1,4 @@
 # JOAR Problem solving
-# TO DO:
-#   1. MA alg. 구현(유전알고리즘은 1-hop / MA는 n-hop routing, MA alg.과 mutation 같은 부분 있음)
-#       1-1. migration 디버깅
-#       1-2. cost func 구현
-#   2. 최적해, 그리디 알고리즘 구현
-#   3. 환경설정 저장하고 불러오기
-#   5. 코드 리팩토링(이후 작업까지 감안해서 정리, Env. generator 분리 필요)
-#   * cost 비교할 때 배치 안 된 wf 고려해야 함
 
 
 # MAX_MATRIX_INDEX = NumOfDrones + NumOfEdgeServer + NumOfCloudServer  # 네트워크 연결 정보 저장 테이블의 최대 인덱스
