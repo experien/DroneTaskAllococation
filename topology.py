@@ -1,6 +1,7 @@
 from abc import ABCMeta
 from random import randint, randrange
 from itertools import product, chain
+
 from parameters import *
 
 

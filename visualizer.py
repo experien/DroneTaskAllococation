@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
-from parameters import *
 from random import random
+
+from parameters import *
 
 
 class Visualizer:

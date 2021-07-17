@@ -22,9 +22,10 @@
 # ma.display(ma_record)
 #
 
-from topology import *
-from solver import *
+
 from evaluator import *
+from allocator import *
+from solver_ga import *
 from visualizer import *
 
 

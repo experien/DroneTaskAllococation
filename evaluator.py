@@ -1,5 +1,4 @@
 from abc import *
-from topology import *
 from solution import *
 from parameters import *
 
