@@ -1,9 +1,9 @@
 # TODO List:
-#   - Evaluator 구현(에너지 모델? 거리?)
-#   - OPT 구현
-#   - MA 구현
-#   - GeneticSolver GA 마저 만들기
 #   - 환경설정 저장하고 불러오기
+#   - OPT (jhjang)
+#   - MA (jhjang)
+#   - Evaluator - 에너지 모델? 거리? (jhjang)
+#   - GeneticSolver (bjkim)
 
 # # ======================================================================================================
 # import ma
