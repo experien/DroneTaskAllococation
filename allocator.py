@@ -215,6 +215,9 @@ class OptimalAllocator(Allocator):
                 self._merge(cur_wf, partial_solution)
                 self._merge_partial_solutions(workflows[1:])
                 self._unmerge(cur_wf, partial_solution)
+            else:
+                # TODO: 충돌 날 경우 branch 만들어서 BFS 돌리기
+                pass
 
     def _mergeable(self, wf, partial_solution):
         prev_node = None
