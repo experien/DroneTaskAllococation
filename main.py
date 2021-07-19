@@ -80,7 +80,7 @@ def test(test_setting_name):
     best_solution = solver.solve()
     if best_solution:
         best_score = best_solution.evaluate()
-        title = 'best solution({:.3f})'.format(best_score)
+        title = f'best solution {best_score}'
     else:
         title = 'No feasible solution found'
 

@@ -83,6 +83,8 @@ class RandomAllocator(Allocator):
         return False
 
 
+# TODO: 구조변경-WF별로 모든 경우(n_node*n_node) ^ 각 wf이미지? 조합+가지치기(n_wf)
+#       현재 최적해 안 나옴
 class OptimalAllocator(Allocator):
     # completely searches the problem space in the given topology
     # returns the best solution among the all possible assignments

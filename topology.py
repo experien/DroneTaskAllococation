@@ -19,14 +19,6 @@ class StaticTopology:
         self.all_nodes = self.drones + self.edge_servers + self.cloud_servers
         self.n_all_node = len(self.all_nodes)
 
-        # investigate distance between all pairs of nodes
-        self.distance = {}
-        for node1, node2 in product(self.all_nodes, self.all_nodes):
-            dist_x = node1.pos_x - node2.pos_x
-            dist_y = node1.pos_y - node2.pos_y
-            d = pow(dist_x ** 2 + dist_y ** 2, 0.5)
-            self.distance[(node1, node2)] = self.distance[(node2, node1)] = d
-
         # build connection info.
         # self.links = self._connect(self.drones, self.drones, dist_constrained=True)
         # self.links |= self._connect(self.drones, self.edge_servers)
@@ -38,6 +30,13 @@ class StaticTopology:
         self._connect(self.drones, self.edge_servers)
         self._connect(self.edge_servers, self.cloud_servers)
 
+        # investigate distance of CONNECTED pairs of nodes
+        self.distance = {}
+        for node1 in self.all_nodes:
+            for node2 in node1.neighbors:
+                d = self._distance_between(node1, node2)
+                self.distance[(node1, node2)] = self.distance[(node2, node1)] = d
+
         # generate workflows & tasks
         self.workflows = [WorkFlow() for _ in range(global_params.NumOfWorkflows)]
         self.all_tasks = list(chain(*[wf.tasks for wf in self.workflows]))
@@ -47,6 +46,12 @@ class StaticTopology:
             self.print_nodes()
             self.print_workflow_n_tasks()
             self.print_distances()
+
+    @staticmethod
+    def _distance_between(node1, node2):
+        dist_x = node1.pos_x - node2.pos_x
+        dist_y = node1.pos_y - node2.pos_y
+        return pow(dist_x ** 2 + dist_y ** 2, 0.5)
 
     @staticmethod
     def _deploy(constructor, n, x_range):
@@ -68,7 +73,7 @@ class StaticTopology:
             if node1 == node2:
                 continue
 
-            d = self.distance[(node1, node2)]
+            d = self._distance_between(node1, node2)
             if not dist_constrained or \
                     d <= node1.trans_range and \
                     d <= node2.trans_range:

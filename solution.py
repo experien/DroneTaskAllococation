@@ -32,7 +32,7 @@ class Solution:
         #          they are different views of a single logical state
         #          if you change them, apply the changes to clone() method.
         self.wf_alloc = {wf: False for wf in topology.workflows}
-        self.wf_to_nodes = {wf: set() for wf in topology.workflows}
+        self.wf_to_nodes = {wf: {} for wf in topology.workflows}  # keep order
         self.task_to_node = {}  # n to 1
         self.node_to_tasks = {node: set() for node in topology.all_nodes} # 1 to n
         self.available_resources = {node: Resources(node.resources)
@@ -46,6 +46,8 @@ class Solution:
         self.require_evaluation = True
 
     def mappable(self, prev_node, task, target_node):
+        if prev_node and prev_node.id == 3 and target_node.id == 4:
+            pass
         first_task = not prev_node
         resource_ok = task.required_resources <= self.available_resources[target_node]
         visited = target_node in self.wf_to_nodes[task.workflow]
@@ -63,7 +65,7 @@ class Solution:
             return False
 
         wf = task.workflow
-        self.wf_to_nodes[wf].add(target_node)
+        self.wf_to_nodes[wf][target_node] = True
         if len(self.wf_to_nodes[wf]) == wf.n_task:
             self.wf_alloc[wf] = True
 
@@ -80,7 +82,7 @@ class Solution:
 
         target_node = self.task_to_node[task]
         wf = task.workflow
-        self.wf_to_nodes[wf].remove(target_node)
+        del self.wf_to_nodes[wf][target_node]
         self.wf_alloc[wf] = False
         del self.task_to_node[task]
         self.node_to_tasks[target_node].remove(task)
@@ -96,19 +98,20 @@ class Solution:
         return self.wf_alloc[wf]
 
     def assigned_nodes(self, workflow):
-        return list(self.wf_to_nodes[workflow])
+        return list(self.wf_to_nodes[workflow].keys())
 
     def evaluate(self):
-        if self.require_evaluation:
+        #if self.require_evaluation:
+        if True:
             self.value = self.evaluator.evaluate(self)
             self.require_evaluation = False
 
-        return self.value
+        return (-self.workflow_alloc_cnt, self.value)
 
     def clone(self):
         new_solution = Solution(self.topology, self.evaluator)
         new_solution.wf_alloc = dict(self.wf_alloc)
-        new_solution.wf_to_nodes = {wf: set(self.wf_to_nodes[wf])
+        new_solution.wf_to_nodes = {wf: dict(self.wf_to_nodes[wf])
                                     for wf in self.wf_to_nodes}
         new_solution.task_to_node = dict(self.task_to_node)
         new_solution.node_to_tasks = {node: set(self.node_to_tasks[node])
@@ -125,13 +128,11 @@ class Solution:
 
     def print_allocation(self):
         print(f"[DBG] Solution#{self.id}:", end=' ')
-        print(f"allocated {self.workflow_alloc_cnt} of {global_params.NumOfWorkflows} workflows.", end=' ')
-        print("VALUE={:.3f}".format(self.evaluate()))
-
-        print("      WorkFlow#id(# of tasks) : [target node1, target node2, ...]")
+        print(f"allocated {self.workflow_alloc_cnt} of {global_params.NumOfWorkflows} workflows.")
         print()
         for wf in self.topology.workflows:
-            print(f"      {wf}({wf.n_task} tasks) : ", self.wf_to_nodes[wf] if self.wf_to_nodes[wf] else "{}")
+            print(f"      {wf}({wf.n_task} tasks) : ",
+                  list(self.wf_to_nodes[wf].keys()))
         print()
 
 
