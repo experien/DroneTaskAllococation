@@ -18,6 +18,7 @@ class Solution:
         self.id = Solution.id_base
 
         # remember previous arguments for parameters 'topology' and 'evaluator'
+        # Sorry. this code doesn't work now
         if topology:
             Solution.topology = self.topology = topology
         else:
@@ -32,7 +33,7 @@ class Solution:
         #          they are different views of a single logical state
         #          if you change them, apply the changes to clone() method.
         self.wf_alloc = {wf: False for wf in topology.workflows}
-        self.wf_to_nodes = {wf: {} for wf in topology.workflows}  # keep order
+        self.wf_to_nodes = {wf: {} for wf in topology.workflows}  # ordered
         self.task_to_node = {}  # n to 1
         self.node_to_tasks = {node: set() for node in topology.all_nodes} # 1 to n
         self.available_resources = {node: Resources(node.resources)
@@ -46,8 +47,6 @@ class Solution:
         self.require_evaluation = True
 
     def mappable(self, prev_node, task, target_node):
-        if prev_node and prev_node.id == 3 and target_node.id == 4:
-            pass
         first_task = not prev_node
         resource_ok = task.required_resources <= self.available_resources[target_node]
         visited = target_node in self.wf_to_nodes[task.workflow]
@@ -86,7 +85,7 @@ class Solution:
         self.wf_alloc[wf] = False
         del self.task_to_node[task]
         self.node_to_tasks[target_node].remove(task)
-        self.available_resources[target_node] -= task.required_resources
+        self.available_resources[target_node] += task.required_resources
         self.require_evaluation = True
         return True
 

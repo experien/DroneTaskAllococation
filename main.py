@@ -1,9 +1,9 @@
 # TODO List:
-#   - OPT (jhjang) : 디버깅(결과 이상함), 중복제거, 가지치기
-#   - 파일에 저장하고 불러오기 (파라미터, 토폴로지, 솔루션)
-#   - MA (jhjang)
-#   - Evaluator - 에너지 모델? 거리?
+#   - OPT (jhjang) - 검증 더 해보기, 가지치기
 #   - GeneticSolver (bjkim)
+#   - MA (jhjang)
+#   - 엑셀/csv 파일에 저장하고 불러오기 (파라미터, 토폴로지, 배치)
+#   - Evaluator - 에너지 모델? 거리?
 
 # # ======================================================================================================
 # import ma
@@ -39,10 +39,7 @@ test_settings = {
     'optimal': {
         'allocator' : OptimalAllocator,
         'evaluator' : StupidEvaluator,
-        'solver'    : OptimalSolver,
-
-        # if this value is True, incomplete cases(failed to allocate some workflows) will be included
-        'include_incomplete_cases': True
+        'solver'    : OptimalSolver
     },
     'genetic': {
         'allocator' : RandomAllocator,
@@ -67,10 +64,7 @@ def test(test_setting_name):
 
     setting = test_settings[test_setting_name]
     evaluator = setting['evaluator'](topology)
-    if test_setting_name == 'optimal':
-        allocator = setting['allocator'](topology, evaluator, setting['include_incomplete_cases'])
-    else:
-        allocator = setting['allocator'](topology, evaluator)
+    allocator = setting['allocator'](topology, evaluator)
 
     if 'params' in setting:
         solver = setting['solver'](topology, allocator, evaluator, setting['params'])

@@ -71,21 +71,21 @@ class GlobalParameters:
 
 
 vanilla_test_parameters = GlobalParameters(
-    DroneXRange = Range(0, 20),
-    EdgeServerXRange = Range(20, 30),
-    CloudServerXRange = Range(30, 40),
-    AreaXRange = Range(0, 40),
-    AreaYRange = Range(0, 20),
-    EdgeServerYRange = Range(0, 20),
-    CloudServerYRange = Range(0, 20),
+    DroneXRange = Range(0, 30),
+    EdgeServerXRange = Range(30, 40),
+    CloudServerXRange = Range(40, 50),
+    AreaXRange = Range(0, 50),
+    AreaYRange = Range(0, 30),
+    EdgeServerYRange = Range(0, 30),
+    CloudServerYRange = Range(0, 30),
 
     DroneTransRange = 10,
     EdgeServerTransRange = math.inf,
     CloudServerTransRange = math.inf,
 
-    NumOfDrones = 4,
-    NumOfEdgeServer = 1,
-    NumOfCloudServer = 1,
+    NumOfDrones = 10,
+    NumOfEdgeServer = 4,
+    NumOfCloudServer = 4,
 
     MaxProcessingRateOfDrone = 100,
     MaxProcessingRateOfEdgeServer = 500,
@@ -99,7 +99,7 @@ vanilla_test_parameters = GlobalParameters(
     BandwidthOfEdgeServer = 400,
     BandwidthOfCloudServer = 1000,
 
-    NumOfWorkflows = 1,
+    NumOfWorkflows = 4,
     MinTasksPerWorkFlow = 4,
     MaxTasksPerWorkflow = 4,
     MinRequiredProcessingPower = 40,
