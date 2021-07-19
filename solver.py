@@ -53,11 +53,11 @@ class Solver(metaclass=ABCMeta):
         eval_norm = self._normalize(evaluations)
 
         print(f"[DBG] {sovler_name} summary: {len(solutions)} solutions: ")
-        print("       solution, no. of allocated workflows, value, normalized: ")
         for solution, evaluation in zip(solutions, eval_norm):
             if solution is best_solution:
                 solution.print_allocation()
 
+                print("       solution, no. of allocated workflows, value, normalized: ")
                 print('      solution#{}\t{:6}\t{:10.3f}\t{:.3f}'.format(
                     solution.id, solution.workflow_alloc_cnt, solution.evaluate(), evaluation),
                       '(BEST)' if solution is best_solution else '')
@@ -69,7 +69,7 @@ class Solver(metaclass=ABCMeta):
 
 
 class StupidSolver(Solver):
-    def __init__(self, topology, allocator, evaluator, size=200):
+    def __init__(self, topology, allocator, evaluator, size=1000):
         super().__init__(topology, allocator, evaluator)
         self.size=size
 

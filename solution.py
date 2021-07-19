@@ -49,9 +49,10 @@ class Solution:
         first_task = not prev_node
         resource_ok = task.required_resources <= self.available_resources[target_node]
         visited = target_node in self.wf_to_nodes[task.workflow]
+        connected = target_node in prev_node.neighbors if not first_task else True
 
         return first_task and resource_ok or \
-                not first_task and not visited and resource_ok
+                not first_task and not visited and connected and resource_ok
 
     def map(self, prev_node, task, target_node):
         # 'task' should be a not-assigned-task

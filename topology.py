@@ -85,8 +85,6 @@ class StaticTopology:
         for node in self.all_nodes:
             print(node.info())
         print()
-        input("Press <ENTER> to continue...... >>>")
-        print()
 
     def print_workflow_n_tasks(self):
         print(f"[DBG] {global_params.NumOfWorkflows} workflows generated")
@@ -95,17 +93,13 @@ class StaticTopology:
         for wf in self.workflows:
             print('      ' + wf.info())
         print()
-        input("Press <ENTER> to continue...... >>>")
-        print()
 
     def print_distances(self):
         print(f"[DBG] Node-to-Node distances")
         print()
         for node1 in self.all_nodes:
             for node2 in node1.neighbors:
-                print(f'      P{node1}-{node2} : {self.distance[(node1, node2)]}')
-        print()
-        input("Press <ENTER> to continue...... >>>")
+                print(f'      {node1}-{node2} : {self.distance[(node1, node2)]}')
         print()
 
 
@@ -148,7 +142,9 @@ class Node(metaclass=ABCMeta):
 
     def info(self):
         stat = list(self.resources.values()) + [self.delay_factor]
-        return self.__repr__() + ' ' + str(stat) + ' neighbors: ' + str(self.neighbors)
+        return self.__repr__() + ' ' + str(stat) + \
+               f', position:({self.pos_x}, {self.pos_y})' + \
+               ' , neighbors: ' + str(self.neighbors)
 
 
 class Drone(Node):

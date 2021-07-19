@@ -99,7 +99,7 @@ vanilla_test_parameters = GlobalParameters(
     BandwidthOfEdgeServer = 400,
     BandwidthOfCloudServer = 1000,
 
-    NumOfWorkflows = 4,
+    NumOfWorkflows = 1,
     MinTasksPerWorkFlow = 4,
     MaxTasksPerWorkflow = 4,
     MinRequiredProcessingPower = 40,

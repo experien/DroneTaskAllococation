@@ -99,4 +99,4 @@ with open('dump/topology.bin', 'wb') as fout:
 
 test('stupid')
 test('optimal')
-test('genetic')
+#test('genetic')

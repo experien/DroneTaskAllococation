@@ -112,10 +112,6 @@ class OptimalAllocator(Allocator):
                 optimum = self.evaluator.get_best([optimum, sub_optimum])
 
         if DEBUG:
-            if DEBUG_ALL_CASES:
-                input("Press <ENTER> to continue...... >>>")
-                print()
-
             print("[DBG] OptimalAllocator:")
             print(f"      found {n_cases} cases")
             print()
