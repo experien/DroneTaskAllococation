@@ -87,12 +87,15 @@ def test(test_setting_name):
     Visualizer.draw(title, topology, best_solution)
 
 
-#topology = StaticTopology()
-# with open('dump/topology.bin', 'wb') as fout:
-#     pickle.dump(topology, fout)
+topology = StaticTopology()
+with open('dump/topology.bin', 'wb') as fout:
+    pickle.dump(topology, fout)
 
-with open('dump/topology.bin', 'rb') as fin:
-    topology = pickle.load(fin)
+# with open('dump/topology.bin', 'rb') as fin:
+#     topology = pickle.load(fin)
+#     topology.print_nodes()
+#     topology.print_workflow_n_tasks()
+#     topology.print_distances()
 
 test('stupid')
 test('optimal')

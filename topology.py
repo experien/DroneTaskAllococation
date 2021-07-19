@@ -44,8 +44,9 @@ class StaticTopology:
         self.n_all_task = len(self.all_tasks)
 
         if DEBUG:
-            self._print_nodes()
-            self._print_workflow_n_tasks()
+            self.print_nodes()
+            self.print_workflow_n_tasks()
+            self.print_distances()
 
     @staticmethod
     def _deploy(constructor, n, x_range):
@@ -72,12 +73,12 @@ class StaticTopology:
                     d <= node1.trans_range and \
                     d <= node2.trans_range:
                 #links[(node1, node2)] = links[(node2, node1)] = True
-                node1.neighbors.append(node2)
-                node2.neighbors.append(node1)
+                node1.neighbors.add(node2)
+                node2.neighbors.add(node1)
 
         #return links
 
-    def _print_nodes(self):
+    def print_nodes(self):
         print(f"[DBG] {self.n_all_node} nodes generated")
         print("      Node#id [processing power, bandwidth, delay factor]")
         print()
@@ -87,12 +88,22 @@ class StaticTopology:
         input("Press <ENTER> to continue...... >>>")
         print()
 
-    def _print_workflow_n_tasks(self):
+    def print_workflow_n_tasks(self):
         print(f"[DBG] {global_params.NumOfWorkflows} workflows generated")
         print("      WorkFlow#id [Task#id [processing power req., bandwidth req.], ...]")
         print()
         for wf in self.workflows:
             print('      ' + wf.info())
+        print()
+        input("Press <ENTER> to continue...... >>>")
+        print()
+
+    def print_distances(self):
+        print(f"[DBG] Node-to-Node distances")
+        print()
+        for node1 in self.all_nodes:
+            for node2 in node1.neighbors:
+                print(f'      P{node1}-{node2} : {self.distance[(node1, node2)]}')
         print()
         input("Press <ENTER> to continue...... >>>")
         print()
@@ -130,14 +141,14 @@ class Node(metaclass=ABCMeta):
         self.id = Node.id_base
         self.pos_x = pos_x
         self.pos_y = pos_y
-        self.neighbors = []
+        self.neighbors = set()
 
     def __repr__(self):
         return f'Node#{self.id}'
 
     def info(self):
         stat = list(self.resources.values()) + [self.delay_factor]
-        return self.__repr__() + ' ' + str(stat)
+        return self.__repr__() + ' ' + str(stat) + ' neighbors: ' + str(self.neighbors)
 
 
 class Drone(Node):

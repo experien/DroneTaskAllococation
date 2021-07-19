@@ -55,13 +55,21 @@ class Solver(metaclass=ABCMeta):
         print(f"[DBG] {sovler_name} summary: {len(solutions)} solutions: ")
         print("       solution, no. of allocated workflows, value, normalized: ")
         for solution, evaluation in zip(solutions, eval_norm):
-            print('      solution#{}\t{:6}\t{:10.3f}\t{:.3f}'.format(
-                solution.id, solution.workflow_alloc_cnt, solution.evaluate(), evaluation),
-                  '(BEST)' if solution is best_solution else '')
+            if solution is best_solution:
+                solution.print_allocation()
+
+                print('      solution#{}\t{:6}\t{:10.3f}\t{:.3f}'.format(
+                    solution.id, solution.workflow_alloc_cnt, solution.evaluate(), evaluation),
+                      '(BEST)' if solution is best_solution else '')
+
+        # for solution, evaluation in zip(solutions, eval_norm):
+        #     print('      solution#{}\t{:6}\t{:10.3f}\t{:.3f}'.format(
+        #         solution.id, solution.workflow_alloc_cnt, solution.evaluate(), evaluation),
+        #           '(BEST)' if solution is best_solution else '')
 
 
 class StupidSolver(Solver):
-    def __init__(self, topology, allocator, evaluator, size=10):
+    def __init__(self, topology, allocator, evaluator, size=200):
         super().__init__(topology, allocator, evaluator)
         self.size=size
 

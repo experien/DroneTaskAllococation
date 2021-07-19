@@ -72,7 +72,7 @@ class RandomAllocator(Allocator):
         if len(tasks) == 1:
             return True
 
-        neighbors = cur_node.neighbors[:]
+        neighbors = list(cur_node.neighbors)
         shuffle(neighbors)
         for next_node in neighbors:
             if self.solution.mappable(cur_node, tasks[1], next_node) and \
