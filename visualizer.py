@@ -39,10 +39,10 @@ class Visualizer:
         cls._draw_nodes(cls.topology.cloud_servers, 'red', 150)
 
         # area
-        y = AreaYRange.stop
-        plt.fill_between(DroneXRange,[y, y], alpha=0.1)
-        plt.fill_between(EdgeServerXRange,[y, y], alpha=0.2)
-        plt.fill_between(CloudServerXRange,[y, y], alpha=0.1)
+        y = global_params.AreaYRange.stop
+        plt.fill_between([*global_params.DroneXRange],[y, y], alpha=0.1)
+        plt.fill_between([*global_params.EdgeServerXRange],[y, y], alpha=0.2)
+        plt.fill_between([*global_params.CloudServerXRange],[y, y], alpha=0.1)
 
         # drone-to-drone connections
         for drone1 in cls.topology.drones:

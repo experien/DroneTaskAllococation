@@ -13,8 +13,8 @@ class GeneticSolverParameters:
 
 
 class GeneticSolver(Solver):
-    def __init__(self, topology, allocator, params):
-        super().__init__(topology, allocator)
+    def __init__(self, topology, allocator, evaluator, params):
+        super().__init__(topology, allocator, evaluator)
         self.params = params
         self.population = []
 
@@ -25,9 +25,7 @@ class GeneticSolver(Solver):
             self.population.append(chromosome)
 
         if DEBUG:
-            print(f"[DBG] Initial population (size {len(self.population)}): ")
-            for chromosome in self.population:
-                print('      ', chromosome)
+            self.print_summary(self.population)
 
         for _ in range(self.params.n_generation):
             self.population = self._make_next_generation()

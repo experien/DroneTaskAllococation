@@ -13,9 +13,9 @@ class StaticTopology:
 
     def __init__(self):
         # generate & deploy nodes
-        self.drones = self._deploy(Drone, NumOfDrones, DroneXRange)
-        self.edge_servers = self._deploy(EdgeServer, NumOfEdgeServer, EdgeServerXRange)
-        self.cloud_servers = self._deploy(CloudServer, NumOfCloudServer, CloudServerXRange)
+        self.drones = self._deploy(Drone, global_params.NumOfDrones, global_params.DroneXRange)
+        self.edge_servers = self._deploy(EdgeServer, global_params.NumOfEdgeServer, global_params.EdgeServerXRange)
+        self.cloud_servers = self._deploy(CloudServer, global_params.NumOfCloudServer, global_params.CloudServerXRange)
         self.all_nodes = self.drones + self.edge_servers + self.cloud_servers
         self.n_all_node = len(self.all_nodes)
 
@@ -39,7 +39,7 @@ class StaticTopology:
         self._connect(self.edge_servers, self.cloud_servers)
 
         # generate workflows & tasks
-        self.workflows = [WorkFlow() for _ in range(NumOfWorkflows)]
+        self.workflows = [WorkFlow() for _ in range(global_params.NumOfWorkflows)]
         self.all_tasks = list(chain(*[wf.tasks for wf in self.workflows]))
         self.n_all_task = len(self.all_tasks)
 
@@ -52,7 +52,7 @@ class StaticTopology:
         nodes = []
         for _ in range(n):
             x = randrange(*x_range)
-            y = randrange(*AreaYRange)
+            y = randrange(*global_params.AreaYRange)
             nodes.append(constructor(x, y))
 
         return nodes
@@ -84,13 +84,17 @@ class StaticTopology:
         for node in self.all_nodes:
             print(node.info())
         print()
+        input("Press <ENTER> to continue...... >>>")
+        print()
 
     def _print_workflow_n_tasks(self):
-        print(f"[DBG] {NumOfWorkflows} workflows generated")
+        print(f"[DBG] {global_params.NumOfWorkflows} workflows generated")
         print("      WorkFlow#id [Task#id [processing power req., bandwidth req.], ...]")
         print()
         for wf in self.workflows:
             print('      ' + wf.info())
+        print()
+        input("Press <ENTER> to continue...... >>>")
         print()
 
 
@@ -137,36 +141,36 @@ class Node(metaclass=ABCMeta):
 
 
 class Drone(Node):
-    trans_range = DroneTransRange
+    trans_range = global_params.DroneTransRange
     resources = Resources(
-        processing_power=MaxProcessingRateOfDrone,
-        bandwidth=BandwidthOfDrone
+        processing_power=global_params.MaxProcessingRateOfDrone,
+        bandwidth=global_params.BandwidthOfDrone
     )
-    delay_factor=MaxDelayFactorOfDrone
+    delay_factor=global_params.MaxDelayFactorOfDrone
 
     def __repr__(self):
         return f'Drone#{self.id}'
 
 
 class EdgeServer(Node):
-    trans_range = EdgeServerTransRange
+    trans_range = global_params.EdgeServerTransRange
     resources = Resources(
-        processing_power=MaxProcessingRateOfEdgeServer,
-        bandwidth=BandwidthOfEdgeServer
+        processing_power=global_params.MaxProcessingRateOfEdgeServer,
+        bandwidth=global_params.BandwidthOfEdgeServer
     )
-    delay_factor = MaxDelayFactorOfEdgeServer
+    delay_factor = global_params.MaxDelayFactorOfEdgeServer
 
     def __repr__(self):
         return f'Edge#{self.id}'
 
 
 class CloudServer(Node):
-    trans_range = CloudServerTransRange
+    trans_range = global_params.CloudServerTransRange
     resources = Resources(
-        processing_power=MaxProcessingRateOfCloudServer,
-        bandwidth=BandwidthOfCloudServer
+        processing_power=global_params.MaxProcessingRateOfCloudServer,
+        bandwidth=global_params.BandwidthOfCloudServer
     )
-    delay_factor = MaxDelayFactorOfCloudServer,
+    delay_factor = global_params.MaxDelayFactorOfCloudServer
 
     def __repr__(self):
         return f'Cloud#{self.id}'
@@ -179,12 +183,12 @@ class WorkFlow:
         WorkFlow.id_base += 1
         self.id = WorkFlow.id_base
 
-        self.n_task = randint(MinTasksPerWorkFlow, MaxTasksPerWorkflow)
+        self.n_task = randint(global_params.MinTasksPerWorkFlow, global_params.MaxTasksPerWorkflow)
         self.tasks = []
         for _ in range(self.n_task):
             res = Resources(
-                processing_power=randint(MinRequiredProcessingPower, MaxRequiredProcessingPower),
-                bandwidth=randint(MinRequiredBandwidth, MaxRequiredBandwidth)
+                processing_power=randint(global_params.MinRequiredProcessingPower, global_params.MaxRequiredProcessingPower),
+                bandwidth=randint(global_params.MinRequiredBandwidth, global_params.MaxRequiredBandwidth)
             )
             self.tasks.append(Task(self, res))
 
