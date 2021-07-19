@@ -27,6 +27,7 @@ from evaluator import *
 from allocator import *
 from solver_ga import *
 from visualizer import *
+import pickle
 
 
 test_settings = {
@@ -86,7 +87,13 @@ def test(test_setting_name):
     Visualizer.draw(title, topology, best_solution)
 
 
-topology = StaticTopology()
+#topology = StaticTopology()
+# with open('dump/topology.bin', 'wb') as fout:
+#     pickle.dump(topology, fout)
+
+with open('dump/topology.bin', 'rb') as fin:
+    topology = pickle.load(fin)
+
 test('stupid')
 test('optimal')
 test('genetic')
