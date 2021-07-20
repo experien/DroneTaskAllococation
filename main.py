@@ -30,7 +30,7 @@ from visualizer import *
 import pickle
 
 
-test_settings = {
+test_mode_settings = {
     'stupid' : {
         'allocator' : RandomAllocator,
         'evaluator' : StupidEvaluator,
@@ -56,13 +56,13 @@ test_settings = {
 
 
 def test(test_setting_name):
-    assert test_setting_name in test_settings, "Invalid test name: " + test_setting_name
+    assert test_setting_name in test_mode_settings, "Invalid test name: " + test_setting_name
 
     if DEBUG:
         print(f"\n====================[{test_setting_name}] TEST ====================")
         print()
 
-    setting = test_settings[test_setting_name]
+    setting = test_mode_settings[test_setting_name]
     evaluator = setting['evaluator'](topology)
     allocator = setting['allocator'](topology, evaluator)
 

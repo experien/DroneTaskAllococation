@@ -70,7 +70,7 @@ class Solver(metaclass=ABCMeta):
 
 
 class StupidSolver(Solver):
-    def __init__(self, topology, allocator, evaluator, size=100000):
+    def __init__(self, topology, allocator, evaluator, size=10000):
         super().__init__(topology, allocator, evaluator)
         self.size=size
 

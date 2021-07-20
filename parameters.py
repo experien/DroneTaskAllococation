@@ -83,9 +83,9 @@ vanilla_test_parameters = GlobalParameters(
     EdgeServerTransRange = math.inf,
     CloudServerTransRange = math.inf,
 
-    NumOfDrones = 10,
-    NumOfEdgeServer = 4,
-    NumOfCloudServer = 4,
+    NumOfDrones = 4,
+    NumOfEdgeServer = 2,
+    NumOfCloudServer = 1,
 
     MaxProcessingRateOfDrone = 100,
     MaxProcessingRateOfEdgeServer = 500,
@@ -99,7 +99,7 @@ vanilla_test_parameters = GlobalParameters(
     BandwidthOfEdgeServer = 400,
     BandwidthOfCloudServer = 1000,
 
-    NumOfWorkflows = 4,
+    NumOfWorkflows = 2,
     MinTasksPerWorkFlow = 4,
     MaxTasksPerWorkflow = 4,
     MinRequiredProcessingPower = 40,
