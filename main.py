@@ -33,17 +33,17 @@ import pickle
 test_mode_settings = {
     'stupid' : {
         'allocator' : RandomAllocator,
-        'evaluator' : StupidEvaluator,
-        'solver'    : StupidSolver
+        'evaluator' : DistanceEvaluator,
+        'solver'    : SimpleSolver
     },
     'optimal': {
         'allocator' : OptimalAllocator,
-        'evaluator' : StupidEvaluator,
+        'evaluator' : DistanceEvaluator,
         'solver'    : OptimalSolver
     },
     'genetic': {
         'allocator' : RandomAllocator,
-        'evaluator' : StupidEvaluator,
+        'evaluator' : DistanceEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10,

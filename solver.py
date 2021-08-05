@@ -69,7 +69,7 @@ class Solver(metaclass=ABCMeta):
         #           '(BEST)' if solution is best_solution else '')
 
 
-class StupidSolver(Solver):
+class SimpleSolver(Solver):
     def __init__(self, topology, allocator, evaluator, size=10000):
         super().__init__(topology, allocator, evaluator)
         self.size=size
@@ -91,6 +91,6 @@ class StupidSolver(Solver):
         pass
 
 
-class OptimalSolver(StupidSolver):
+class OptimalSolver(SimpleSolver):
     def __init__(self, topology, allocator, evaluator):
         super().__init__(topology, allocator, evaluator, size=1)

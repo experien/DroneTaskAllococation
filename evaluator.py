@@ -18,7 +18,7 @@ class Evaluator(metaclass=ABCMeta):
         return solutions[0] if solutions else None
 
 
-class StupidEvaluator(Evaluator):
+class DistanceEvaluator(Evaluator):
     # sum of node-to-node distances
     def evaluate(self, solution):
         sum_dist = 0
