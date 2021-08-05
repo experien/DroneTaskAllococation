@@ -31,9 +31,10 @@ import pickle
 
 
 test_mode_settings = {
-    'stupid' : {
+    'random' : {
         'allocator' : RandomAllocator,
-        'evaluator' : DistanceEvaluator,
+        'evaluator' : EnergyEvaluator,
+        #'evaluator' : DistanceEvaluator,
         'solver'    : SimpleSolver
     },
     'optimal': {
@@ -43,11 +44,11 @@ test_mode_settings = {
     },
     'genetic': {
         'allocator' : RandomAllocator,
-        'evaluator' : DistanceEvaluator,
+        'evaluator' : EnergyEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
-                        population_size=10,
-                        n_generation=100,
+                        population_size=1000,
+                        n_generation=10000,
                         selection_ratio=0.2,
                         mutation_ratio=0.1
                     )
@@ -91,6 +92,6 @@ with open('dump/topology.bin', 'wb') as fout:
 #     topology.print_workflow_n_tasks()
 #     topology.print_distances()
 
-test('stupid')
-test('optimal')
-#test('genetic')
+test('random')
+#test('optimal')
+test('genetic')

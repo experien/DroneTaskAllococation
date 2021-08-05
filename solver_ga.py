@@ -1,8 +1,8 @@
 from solver import *
 from solution import *
-from random import shuffle
+from random import shuffle, sample
 from dataclasses import dataclass
-
+from heapq import *
 
 @dataclass
 class GeneticSolverParameters:
@@ -24,15 +24,66 @@ class GeneticSolver(Solver):
             chromosome = self.allocator.allocate_workflows()
             self.population.append(chromosome)
 
+        heapify(self.population)
+
+        n_iter = 0
+        while n_iter < self.params.n_generation:
+            # self.population = self._make_next_generation()
+            mother, father = sample(self.population, 2)
+            child = self._crossover(mother, father)
+            if not child:
+                continue
+
+            if mother < child or father < child:
+                heappop(self.population)
+                heappush(self.population, child)
+
+            if DEBUG:
+                if n_iter % len(self.population) == 0:
+                    print(n_iter, "th iteration:", self.evaluator.get_best(self.population))
+
+            n_iter += 1
+
         if DEBUG:
             self.print_summary(self.population)
 
-        for _ in range(self.params.n_generation):
-            self.population = self._make_next_generation()
+        return self.evaluator.get_best(self.population)
 
-        return max(self.population, key=lambda c: c.evaluate())
+    def _crossover(self, mother, father):
+        cut_point = global_params.NumOfWorkflows // 2
+        child = Solution(self.topology, self.evaluator)
+        for i, wf in enumerate(self.topology.workflows):
+            base = mother if i < cut_point else father
+            prev_node = None
+            for task in wf.tasks:
+                target_node = base.task_to_node[task]
+                if not child.mappable(prev_node, task, target_node):
+                    # fix
+                    fixed = False
+                    if not prev_node:
+                        return None
+
+                    neighbors = list(prev_node.neighbors)
+                    shuffle(neighbors)
+                    for neighbor in neighbors:
+                        if child.mappable(prev_node, task, neighbor):
+                            target_node = neighbor
+                            fixed = True
+                            break
+
+                    if not fixed:
+                        return None
+
+                child.map(prev_node, task, target_node)
+                prev_node = target_node
+
+        return child
+
+    def _fix(self, chromosome):
+        return chromosome
 
     # main tasks for GA
+    # not used currently
     def _make_next_generation(self):
         next_generation = []
         candidates = self._select_by_rank(self.params.selection_ratio)
@@ -71,12 +122,6 @@ class GeneticSolver(Solver):
                 break
 
         return selected
-
-    def _crossover(self, mother, father):
-        return mother
-
-    def _fix(self, chromosome):
-        return chromosome
 
     def _mutate(self, chromosome):
         return chromosome

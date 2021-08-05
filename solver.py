@@ -58,7 +58,7 @@ class Solver(metaclass=ABCMeta):
             if solution is best_solution:
                 solution.print_allocation()
 
-                print("       solution, no. of allocated workflows, sum of distances: ")
+                print("       solution, no. of allocated workflows, metric: ", self.evaluator.metric)
                 print('      solution#{}\t{:16}\t{:12.3f}'.format(
                     solution.id, solution.workflow_alloc_cnt, evaluation[1]),
                       '(BEST)' if solution is best_solution else '')
@@ -70,7 +70,7 @@ class Solver(metaclass=ABCMeta):
 
 
 class SimpleSolver(Solver):
-    def __init__(self, topology, allocator, evaluator, size=10000):
+    def __init__(self, topology, allocator, evaluator, size=1000):
         super().__init__(topology, allocator, evaluator)
         self.size=size
 

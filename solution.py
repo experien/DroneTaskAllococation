@@ -44,7 +44,7 @@ class Solution:
         self.value = 0
 
         # if this variable is False, self.evaluate() will return previously calculated value
-        self.require_evaluation = True
+        self._require_evaluation = True
 
     def mappable(self, prev_node, task, target_node):
         first_task = not prev_node
@@ -71,7 +71,7 @@ class Solution:
         self.task_to_node[task] = target_node
         self.node_to_tasks[target_node].add(task)
         self.available_resources[target_node] -= task.required_resources
-        self.require_evaluation = True
+        self._require_evaluation = True
         return True
 
     def unmap(self, task):
@@ -86,7 +86,7 @@ class Solution:
         del self.task_to_node[task]
         self.node_to_tasks[target_node].remove(task)
         self.available_resources[target_node] += task.required_resources
-        self.require_evaluation = True
+        self._require_evaluation = True
         return True
 
     @property
@@ -103,7 +103,7 @@ class Solution:
         #if self.require_evaluation:
         if True:
             self.value = self.evaluator.evaluate(self)
-            self.require_evaluation = False
+            self._require_evaluation = False
 
         return (-self.workflow_alloc_cnt, self.value)
 
@@ -118,12 +118,19 @@ class Solution:
         new_solution.available_resources = {node: Resources(self.available_resources[node])
                                             for node in self.available_resources}
         new_solution.value = self.value
-        new_solution.require_evaluation = self.require_evaluation
+        new_solution._require_evaluation = self._require_evaluation
 
         return new_solution
 
+    def __lt__(self, other):
+        return self.evaluator.get_best([self, other]) == other
+
+    def __gt__(self, other):
+        return self.evaluator.get_best([self, other]) == self
+
     def __repr__(self):
-        return str(self.evaluate())
+        n_wf_alloc, metric = self.evaluate()
+        return str((-n_wf_alloc, "%.2f" % metric))
 
     def print_allocation(self):
         print(f"[DBG] Solution#{self.id}:", end=' ')
