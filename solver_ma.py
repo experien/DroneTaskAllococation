@@ -1,9 +1,52 @@
 from solver import *
+from random import choice
+
+@dataclass
+class MarkovSolverParameters:
+    n_iteration: int
 
 
 # solving JOAR Problem
 class MarkovSolver(Solver):
+    def __init__(self, topology, allocator, evaluator, params):
+        super().__init__(topology, allocator, evaluator)
+        # self.params = params
+        self.n_iteration = params.n_iteration
+
     def solve(self):
+        current_solution = self.allocator.allocate_workflows()
+        candidate_solutions = []
+        for _ in range(self.n_iteration):
+            for wf in self.topology.workflows:
+                tmp = wf.tasks[:] + [None]
+                for t1, t2, t3 in zip(tmp, tmp[1:], tmp[2:]):
+                    node1 = current_solution.task_to_node[t1]
+                    node2 = current_solution.task_to_node[t2]
+                    node3 = current_solution.task_to_node[t3] if t3 else None
+
+                    candidate_node = node1.neighbors
+                    if node3: candidate_node = candidate_node & node3.neighbors
+                    candidate_node -= {node2}
+                    candidate_node = set(filter(
+                        lambda target_node: current_solution.mappable(node1, t2, target_node),
+                        candidate_node)
+                    )
+
+                    if candidate_node:
+                        target_node = choice(list(candidate_node))
+                        new_solution = current_solution.clone()
+                        new_solution.unmap(t2)
+                        new_solution.map(node1, t2, target_node)
+                        candidate_solutions.append(new_solution)
+
+            solution = self._select(candidate_solutions)
+            print(solution.evaluate())
+
+    # TO DO: 선택 기준
+    def _select(self, candidate_solutions):
+            return choice(candidate_solutions)
+
+    def _solve(self):
         pass
 
     def re_solve(self):

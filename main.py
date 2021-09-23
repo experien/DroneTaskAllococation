@@ -28,6 +28,7 @@ from allocator import *
 from solver_ga import *
 from visualizer import *
 import pickle
+from solver_ma import *
 
 
 test_mode_settings = {
@@ -52,6 +53,14 @@ test_mode_settings = {
                         selection_ratio=0.2,
                         mutation_ratio=0.1
                     )
+    },
+    'markov': {
+        'allocator' : RandomAllocator,
+        'evaluator' : EnergyEvaluator,
+        'solver'    : MarkovSolver,
+        'params'    : MarkovSolverParameters(
+            n_iteration=10
+        )
     }
 }
 
@@ -82,10 +91,12 @@ def test(test_setting_name):
     Visualizer.draw(title, topology, best_solution)
 
 
+# Save topology to file
 topology = StaticTopology()
 with open('dump/topology.bin', 'wb') as fout:
     pickle.dump(topology, fout)
 
+# Load topology from file
 # with open('dump/topology.bin', 'rb') as fin:
 #     topology = pickle.load(fin)
 #     topology.print_nodes()
@@ -94,4 +105,5 @@ with open('dump/topology.bin', 'wb') as fout:
 
 test('random')
 #test('optimal')
-test('genetic')
+#test('genetic')
+test('markov')

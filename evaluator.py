@@ -60,7 +60,7 @@ class EnergyEvaluator(Evaluator):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
 
-                    # we have to fix this
+                    # we have to fix this. 단순히 거리 + 프로세싱파워 요구량 더했음
                     consumption[prev_node] += self.topology.get_distance(prev_node, cur_node)
                     consumption[prev_node] += prev_task.required_resources['processing_power']
 
