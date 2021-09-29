@@ -40,7 +40,8 @@ test_mode_settings = {
     },
     'optimal': {
         'allocator' : OptimalAllocator,
-        'evaluator' : DistanceEvaluator,
+        #'evaluator' : DistanceEvaluator,
+        'evaluator' : EnergyEvaluator,
         'solver'    : OptimalSolver
     },
     'genetic': {
@@ -59,7 +60,8 @@ test_mode_settings = {
         'evaluator' : EnergyEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=10
+            n_iteration=1000,     # up to 1600 in the ref' paper.
+            beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
 }
@@ -104,6 +106,6 @@ with open('dump/topology.bin', 'wb') as fout:
 #     topology.print_distances()
 
 test('random')
-#test('optimal')
-#test('genetic')
+test('genetic')
 test('markov')
+test('optimal')

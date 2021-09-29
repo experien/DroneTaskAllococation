@@ -99,7 +99,45 @@ vanilla_test_parameters = GlobalParameters(
     BandwidthOfEdgeServer = 400,
     BandwidthOfCloudServer = 1000,
 
-    NumOfWorkflows = 6,
+    NumOfWorkflows = 4,
+    MinTasksPerWorkFlow = 4,
+    MaxTasksPerWorkflow = 4,
+    MinRequiredProcessingPower = 40,
+    MaxRequiredProcessingPower = 80,
+    MinRequiredBandwidth = 20,
+    MaxRequiredBandwidth = 30
+)
+
+super_vanilla_test_parameters = GlobalParameters(
+    DroneXRange = Range(0, 10),
+    EdgeServerXRange = Range(10, 15),
+    CloudServerXRange = Range(15, 20),
+    AreaXRange = Range(0, 20),
+    AreaYRange = Range(0, 20),
+    EdgeServerYRange = Range(0, 20),
+    CloudServerYRange = Range(0, 20),
+
+    DroneTransRange = 5,
+    EdgeServerTransRange = math.inf,
+    CloudServerTransRange = math.inf,
+
+    NumOfDrones = 4,
+    NumOfEdgeServer = 2,
+    NumOfCloudServer = 1,
+
+    MaxProcessingRateOfDrone = 100,
+    MaxProcessingRateOfEdgeServer = 500,
+    MaxProcessingRateOfCloudServer = 10000,
+
+    MaxDelayFactorOfDrone = 1,
+    MaxDelayFactorOfEdgeServer = 5,
+    MaxDelayFactorOfCloudServer = 6,
+
+    BandwidthOfDrone = 200,
+    BandwidthOfEdgeServer = 400,
+    BandwidthOfCloudServer = 1000,
+
+    NumOfWorkflows = 2,
     MinTasksPerWorkFlow = 4,
     MaxTasksPerWorkflow = 4,
     MinRequiredProcessingPower = 40,
@@ -113,4 +151,4 @@ DEBUG_ALL_CASES = False
 
 
 #global_params = GlobalParameters()
-global_params = vanilla_test_parameters
+global_params = super_vanilla_test_parameters
