@@ -50,6 +50,7 @@ class MarkovSolver(Solver):
                     print(f'[DBG] MA#{iter_cnt}: transition failed')
 
         self.print_summary([current_solution])
+        return current_solution
 
     # randomly select a solution among candidates according to transition_rates of them
     def _select(self, base, candidates):

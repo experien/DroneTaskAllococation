@@ -108,4 +108,4 @@ with open('dump/topology.bin', 'wb') as fout:
 test('random')
 test('genetic')
 test('markov')
-test('optimal')
+#test('optimal')
