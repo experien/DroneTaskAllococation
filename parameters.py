@@ -151,4 +151,6 @@ DEBUG_ALL_CASES = False
 
 
 #global_params = GlobalParameters()
-global_params = super_vanilla_test_parameters
+global_params = vanilla_test_parameters
+#global_params = super_vanilla_test_parameters
+

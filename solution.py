@@ -1,4 +1,5 @@
 from topology import *
+from collections import deque
 
 
 class Solution:
@@ -36,6 +37,7 @@ class Solution:
         self.wf_to_nodes = {wf: {} for wf in topology.workflows}  # ordered
         self.task_to_node = {}  # n to 1
         self.node_to_tasks = {node: set() for node in topology.all_nodes} # 1 to n
+        self.routing_paths = {}
         self.available_resources = {node: Resources(node.resources)
                                     for node in topology.all_nodes}
 
@@ -46,22 +48,46 @@ class Solution:
         # if this variable is False, self.evaluate() will return previously calculated value
         self._require_evaluation = True
 
-    def mappable(self, prev_node, task, target_node):
+    def mappable(self, prev_node, task, target_node, multihop=False):
         first_task = not prev_node
         resource_ok = task.required_resources <= self.available_resources[target_node]
         visited = target_node in self.wf_to_nodes[task.workflow]
-        connected = target_node in prev_node.neighbors if not first_task else True
+        if not multihop:
+            connected = target_node in prev_node.neighbors if not first_task else True
+        else:
+            connected = self._is_connected(prev_node, target_node) if not first_task else True
 
         return first_task and resource_ok or \
                 not first_task and not visited and connected and resource_ok
 
-    def map(self, prev_node, task, target_node):
+    def _is_connected(self, src_node, dst_node):
+        visited = {src_node}
+        que = deque([src_node])
+        while que:
+            cur = que.popleft()
+            for neighbor in cur.neighbors:
+                if neighbor == dst_node:
+                    return True
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    que.append(neighbor)
+
+        return False
+
+    def map(self, prev_node, task, target_node, multihop=False):
         # 'task' should be a not-assigned-task
         if task in self.task_to_node:
             return False
 
-        if not self.mappable(prev_node, task, target_node):
+        if not self.mappable(prev_node, task, target_node, multihop):
             return False
+
+        if multihop and prev_node is not None:
+            path = self._route(prev_node, target_node)
+            if path:
+                self.routing_paths[(prev_node, target_node)] = path
+            else:
+                return False
 
         wf = task.workflow
         self.wf_to_nodes[wf][target_node] = True
@@ -81,6 +107,18 @@ class Solution:
 
         target_node = self.task_to_node[task]
         wf = task.workflow
+
+        # unmap routing path
+        mapped_nodes = list(self.wf_to_nodes[wf].keys())
+        if mapped_nodes[0] == target_node:
+            prev_node = None
+        else:
+            target_idx = mapped_nodes.index(target_node)
+            prev_node = mapped_nodes[target_idx - 1]
+
+        if prev_node and (prev_node, target_node) in self.routing_paths:
+            del self.routing_paths[(prev_node, target_node)]
+
         del self.wf_to_nodes[wf][target_node]
         self.wf_alloc[wf] = False
         del self.task_to_node[task]
@@ -88,6 +126,19 @@ class Solution:
         self.available_resources[target_node] += task.required_resources
         self._require_evaluation = True
         return True
+
+    def _route(self, src_node, dst_node):
+        # min-hop routing
+        paths =deque([[src_node]])
+        while paths:
+            p = paths.popleft()
+            if p[-1] == dst_node:
+                return p
+            for neighbor in p[-1].neighbors:
+                if neighbor not in p:
+                    paths.append(p[:] + [neighbor])
+
+        return None
 
     @property
     def workflow_alloc_cnt(self):
@@ -119,6 +170,7 @@ class Solution:
                                             for node in self.available_resources}
         new_solution.value = self.value
         new_solution._require_evaluation = self._require_evaluation
+        new_solution.routing_paths = {key:value[:] for key, value in self.routing_paths.items()}
 
         return new_solution
 

@@ -34,8 +34,8 @@ from solver_ma import *
 test_mode_settings = {
     'random' : {
         'allocator' : RandomAllocator,
-        'evaluator' : EnergyEvaluator,
         #'evaluator' : DistanceEvaluator,
+        'evaluator' : EnergyEvaluator,
         'solver'    : SimpleSolver
     },
     'optimal': {
@@ -49,25 +49,25 @@ test_mode_settings = {
         'evaluator' : EnergyEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
-                        population_size=1000,
-                        n_generation=10000,
-                        selection_ratio=0.2,
-                        mutation_ratio=0.1
+                        population_size=10000,
+                        n_generation=1000000,
+                        #selection_ratio=0.2, // not used
+                        mutation_ratio=0.2
                     )
     },
     'markov': {
         'allocator' : RandomAllocator,
-        'evaluator' : EnergyEvaluator,
+        'evaluator' : MultihopEnergyEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=1000,     # up to 1600 in the ref' paper.
+            n_iteration=200,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
 }
 
 
-def test(test_setting_name):
+def test(test_setting_name, draw=True):
     assert test_setting_name in test_mode_settings, "Invalid test name: " + test_setting_name
 
     if DEBUG:
@@ -90,22 +90,23 @@ def test(test_setting_name):
     else:
         title = 'No feasible solution found'
 
-    Visualizer.draw(title, topology, best_solution)
+    if draw:
+        Visualizer.draw(title, topology, best_solution)
 
 
 # Save topology to file
-topology = StaticTopology()
-with open('dump/topology.bin', 'wb') as fout:
-    pickle.dump(topology, fout)
+# topology = StaticTopology()
+# with open('dump/topology.bin', 'wb') as fout:
+#     pickle.dump(topology, fout)
 
 # Load topology from file
-# with open('dump/topology.bin', 'rb') as fin:
-#     topology = pickle.load(fin)
-#     topology.print_nodes()
-#     topology.print_workflow_n_tasks()
-#     topology.print_distances()
+with open('dump/topology_large1.bin', 'rb') as fin:
+    topology = pickle.load(fin)
+    topology.print_nodes()
+    topology.print_workflow_n_tasks()
+    topology.print_distances()
 
-test('random')
-test('genetic')
-test('markov')
+#test('random')
+test('genetic', draw=True)
+#test('markov', draw=True)
 #test('optimal')

@@ -8,13 +8,21 @@ class MarkovSolverParameters:
     n_iteration: int
     beta: int
 
+
 # solving JOAR Problem
 class MarkovSolver(Solver):
     def __init__(self, topology, allocator, evaluator, params):
         super().__init__(topology, allocator, evaluator)
         self.params = params
+        self.n_iter_iter = 10
 
     def solve(self):
+        solutions = [self._solve() for _ in range(self.n_iter_iter)]
+        result = self.evaluator.get_best(solutions)
+        self.print_summary([result])
+        return result
+
+    def _solve(self):
         current_solution = self.allocator.allocate_workflows()
         candidate_solutions = []
         for iter_cnt in range(self.params.n_iteration):
@@ -25,11 +33,12 @@ class MarkovSolver(Solver):
                     node2 = current_solution.task_to_node[t2]
                     node3 = current_solution.task_to_node[t3] if t3 else None
 
-                    candidate_node = node1.neighbors
+                    #candidate_node = node1.neighbors
+                    candidate_node = set(self.topology.all_nodes) - set(current_solution.wf_to_nodes[wf].keys())
                     if node3: candidate_node = candidate_node & node3.neighbors
                     candidate_node -= {node2}
                     candidate_node = set(filter(
-                        lambda target_node: current_solution.mappable(node1, t2, target_node),
+                        lambda target_node: current_solution.mappable(node1, t2, target_node, multihop=True),
                         candidate_node)
                     )
 
@@ -37,7 +46,7 @@ class MarkovSolver(Solver):
                         target_node = choice(list(candidate_node))
                         new_solution = current_solution.clone()
                         new_solution.unmap(t2)
-                        new_solution.map(node1, t2, target_node)
+                        new_solution.map(node1, t2, target_node, multihop=True)
                         candidate_solutions.append(new_solution)
 
             if candidate_solutions:
@@ -49,7 +58,6 @@ class MarkovSolver(Solver):
                 else:
                     print(f'[DBG] MA#{iter_cnt}: transition failed')
 
-        self.print_summary([current_solution])
         return current_solution
 
     # randomly select a solution among candidates according to transition_rates of them
@@ -68,7 +76,6 @@ class MarkovSolver(Solver):
         return candidates[-1]
 
     def _get_transition_rate(self, base, target):
-        # TO DO: (-할당된 wf수, metric). 할당된 wf 수를 어떻게 다룰 것인지? 일단 무시함
         # energy fairness: the higher, the better. so change it to 'cost'
         cost_base = 1 - base.evaluate()[1]
         cost_target = 1 - target.evaluate()[1]
