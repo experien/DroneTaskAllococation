@@ -148,7 +148,7 @@ super_vanilla_test_parameters = GlobalParameters(
 
 density_test_parameters = GlobalParameters(
     # default: 30, 4, 2
-    NumOfDrones = 10,
+    NumOfDrones = 30,
     NumOfEdgeServer = 4,
     NumOfCloudServer = 2
 )
@@ -157,8 +157,8 @@ DEBUG = True
 DEBUG_ALL_CASES = False
 
 
-global_params = GlobalParameters()
+#global_params = GlobalParameters()
 #global_params = vanilla_test_parameters
 #global_params = super_vanilla_test_parameters
-#global_params = density_test_parameters
+global_params = density_test_parameters
 

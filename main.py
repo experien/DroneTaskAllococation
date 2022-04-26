@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=10000,
+                        n_generation=1000000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -87,7 +87,7 @@ def test(test_setting_name, draw=True):
     if best_solution:
         allocated_wf, best_score = best_solution.evaluate()
         allocated_wf = -allocated_wf
-        title = f'best solution: {allocated_wf}/{len(topology.workflows)} workflows allocated, result={best_score:.3f}'
+        title = f'best solution: {allocated_wf}/{global_params.NumOfWorkflows} workflows allocated, result={best_score:.3f}'
     else:
         title = 'No feasible solution found'
 
@@ -95,20 +95,21 @@ def test(test_setting_name, draw=True):
         Visualizer.draw(title, topology, best_solution)
 
 
+topology = StaticTopology()
+
 # Save topology to file
-# topology = StaticTopology()
 # with open('dump/topology.bin', 'wb') as fout:
 #     pickle.dump(topology, fout)
 
 # Load topology from file
 # with open('dump/topology_large1.bin', 'rb') as fin:
-with open('dump/topology_small1.bin', 'rb') as fin:
-    topology = pickle.load(fin)
-    topology.print_nodes()
-    topology.print_workflow_n_tasks()
-    topology.print_distances()
+# # with open('dump/topology_small1.bin', 'rb') as fin:
+#     topology = pickle.load(fin)
+#     topology.print_nodes()
+#     topology.print_workflow_n_tasks()
+#     topology.print_distances()
 
 #test('random')
 test('genetic', draw=True)
-#test('markov', draw=True)
+test('markov', draw=True)
 #test('optimal')
