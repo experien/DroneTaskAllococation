@@ -50,9 +50,9 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=1000000,
+                        n_generation=10000,
                         #selection_ratio=0.2, // not used
-                        mutation_ratio=0.2
+                        mutation_ratio=1.0
                     )
     },
     'markov': {
@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopEnergyEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=200,     # up to 1600 in the ref' paper.
+            n_iteration=2000,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
@@ -85,8 +85,9 @@ def test(test_setting_name, draw=True):
 
     best_solution = solver.solve()
     if best_solution:
-        best_score = best_solution.evaluate()
-        title = f'best solution {best_score}'
+        allocated_wf, best_score = best_solution.evaluate()
+        allocated_wf = -allocated_wf
+        title = f'best solution: {allocated_wf}/{len(topology.workflows)} workflows allocated, result={best_score:.3f}'
     else:
         title = 'No feasible solution found'
 
@@ -100,7 +101,8 @@ def test(test_setting_name, draw=True):
 #     pickle.dump(topology, fout)
 
 # Load topology from file
-with open('dump/topology_large1.bin', 'rb') as fin:
+# with open('dump/topology_large1.bin', 'rb') as fin:
+with open('dump/topology_small1.bin', 'rb') as fin:
     topology = pickle.load(fin)
     topology.print_nodes()
     topology.print_workflow_n_tasks()
