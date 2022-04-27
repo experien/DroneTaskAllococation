@@ -53,8 +53,13 @@ class EnergyEvaluator(Evaluator):
     def evaluate(self, solution):
         consumption = {node:0 for node in self.topology.all_nodes}
 
+        allocated_nodes = set()
         for wf in self.topology.workflows:
             if solution.is_allocated(wf):
+
+                for task in wf.tasks:
+                    allocated_nodes.add(solution.task_to_node[task])
+
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
@@ -65,7 +70,8 @@ class EnergyEvaluator(Evaluator):
 
         e_sum = sum(consumption.values())
         e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-        e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
+        #e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
+        e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
         return e_fairness
 
     def get_best(self, solutions):
@@ -84,8 +90,13 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
     def evaluate(self, solution):
         consumption = {node:0 for node in self.topology.all_nodes}
 
+        allocated_nodes = set()
         for wf in self.topology.workflows:
             if solution.is_allocated(wf):
+
+                for task in wf.tasks:
+                    allocated_nodes.add(solution.task_to_node[task])
+
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
@@ -103,7 +114,7 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
         try:
             e_sum = sum(consumption.values())
             e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-            e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
+            e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
             return e_fairness
         except ZeroDivisionError:
             return 0

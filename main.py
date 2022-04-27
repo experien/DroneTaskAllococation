@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=1000000,
+                        n_generation=500000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopEnergyEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=2000,     # up to 1600 in the ref' paper.
+            n_iteration=1000,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }

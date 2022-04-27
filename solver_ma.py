@@ -14,10 +14,10 @@ class MarkovSolver(Solver):
     def __init__(self, topology, allocator, evaluator, params):
         super().__init__(topology, allocator, evaluator)
         self.params = params
-        self.n_iter_iter = 10
+        self.n_iter = 1
 
     def solve(self):
-        solutions = [self._solve() for _ in range(self.n_iter_iter)]
+        solutions = [self._solve() for _ in range(self.n_iter)]
         result = self.evaluator.get_best(solutions)
         self.print_summary([result])
         return result
