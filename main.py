@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopEnergyEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=1000,     # up to 1600 in the ref' paper.
+            n_iteration=500,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
