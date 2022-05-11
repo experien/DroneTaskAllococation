@@ -170,11 +170,11 @@ density_test_parameters_small = GlobalParameters(
     MinRequiredProcessingPower = 40,
     MaxRequiredProcessingPower = 80
 )
-DEBUG = True
+DEBUG = False
 DEBUG_ALL_CASES = False
 
 
-#global_params = GlobalParameters()
+global_params = GlobalParameters()
 #global_params = vanilla_test_parameters
 global_params = super_vanilla_test_parameters
 #global_params = density_test_parameters

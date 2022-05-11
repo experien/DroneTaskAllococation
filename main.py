@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=50000,
+                        n_generation=100000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -93,7 +93,7 @@ def test(test_setting_name, draw=True):
             # energy fairnes index도 계산해서 출력
             energy_evaluator = MultihopEnergyEvaluator(topology)
             fairness_index = energy_evaluator.evaluate(best_solution)
-            print(f"      (energy) fairess idex = {fairness_index:.3f}")
+            print(f"      (energy) fairess index = {fairness_index:.3f}")
     else:
         title = 'No feasible solution found'
 
@@ -116,6 +116,12 @@ topology = StaticTopology()
 #     topology.print_distances()
 
 #test('random')
-#test('genetic', draw=True)
-test('markov', draw=True)
+#test('genetic', draw=False)
+
+for i in range(10):
+    print(f'==============={i}th trial===============')
+    test('markov', draw=False)
+    print()
+    print()
+
 #test('optimal')

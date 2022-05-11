@@ -63,15 +63,12 @@ class EnergyEvaluator(Evaluator):
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
-
-                    #consumption[prev_node] += self.topology.get_distance(prev_node, cur_node)
-                    #consumption[prev_node] += prev_task.required_resources['processing_power']
-                    consumption[prev_node] += self.topology.get_distance(prev_node, cur_node) * prev_task.required_resources['processing_power']
+                    consumption[prev_node] += self.topology.get_distance(prev_node, cur_node) ** 2 + prev_task.required_resources['processing_power']
 
         e_sum = sum(consumption.values())
         e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-        #e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
-        e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
+        e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
+        #e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
         return e_fairness
 
     def get_best(self, solutions):
@@ -101,15 +98,15 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
 
-                    sum_distance = 0
+                    sum_distance_sqr = 0
                     try:
                         p = solution.routing_paths[(prev_node, cur_node)]
                         for src, dst in zip(p, p[1:]):
-                            sum_distance += self.topology.get_distance(src, dst)
+                            sum_distance_sqr += self.topology.get_distance(src, dst) ** 2
                     except KeyError:
                         pass
 
-                    consumption[prev_node] += sum_distance * prev_task.required_resources['processing_power']
+                    consumption[prev_node] += sum_distance_sqr + prev_task.required_resources['processing_power']
 
         try:
             e_sum = sum(consumption.values())
@@ -125,32 +122,26 @@ class MultihopMarkovEvaluator(Evaluator):
         super().__init__(topology)
         self.metric = '(BW + proc.power)'
 
-        def evaluate(self, solution):
-            consumption = {node: 0 for node in self.topology.all_nodes}
-            #cost_proc = {node: 0 for node in self.topology.all_nodes}
-            #cost_bw = {node: 0 for node in self.topology.all_nodes}
+    def evaluate(self, solution):
+        cost_proc = {node: 0 for node in self.topology.all_nodes}
+        cost_bw = {node: 0 for node in self.topology.all_nodes}
+        cost = {node: 0 for node in self.topology.all_nodes}
 
-            allocated_nodes = set()
-            for wf in self.topology.workflows:
-                if solution.is_allocated(wf):
-                    for task in wf.tasks:
-                        allocated_nodes.add(solution.task_to_node[task])
+        for wf in filter(lambda x: solution.is_allocated(x), self.topology.workflows):
+            for task in wf.tasks:
+                node = solution.task_to_node[task]
+                cost_proc[node] += task.required_resources['processing_power']
+                cost_bw[node] += task.required_resources['bandwidth']
 
-                    for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
-                        prev_node = solution.task_to_node[prev_task]
-                        cur_node = solution.task_to_node[cur_task]
+            for node in self.topology.all_nodes:
+                cost_proc[node] = cost_proc[node] / node.resources['processing_power']
+                cost_proc[node] **= 2
+                cost_bw[node] = cost_bw[node] / node.resources['bandwidth']
+                cost_bw[node] **= 2
+                cost[node] = cost_proc[node] + cost_bw[node]
 
-                        sum_distance = 0
-                        try:
-                            p = solution.routing_paths[(prev_node, cur_node)]
-                            for src, dst in zip(p, p[1:]):
-                                sum_distance += self.topology.get_distance(src, dst)
-                        except KeyError:
-                            pass
-
-                        consumption[prev_node] += sum_distance * prev_task.required_resources['processing_power']
-
-            return 0
+        total_cost = sum(cost.values())
+        return total_cost
 
     def get_best(self, solutions):
         if solutions:
