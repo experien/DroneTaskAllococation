@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=100000,
+                        n_generation=500000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -84,6 +84,8 @@ def test(test_setting_name, draw=True):
         solver = setting['solver'](topology, allocator, evaluator)
 
     best_solution = solver.solve()
+    fairness_index = 0
+
     if best_solution:
         allocated_wf, best_score = best_solution.evaluate()
         allocated_wf = -allocated_wf
@@ -94,11 +96,14 @@ def test(test_setting_name, draw=True):
             energy_evaluator = MultihopEnergyEvaluator(topology)
             fairness_index = energy_evaluator.evaluate(best_solution)
             print(f"      (energy) fairess index = {fairness_index:.3f}")
+
+        if draw:
+            Visualizer.draw(title, topology, best_solution)
+
     else:
         title = 'No feasible solution found'
 
-    if draw:
-        Visualizer.draw(title, topology, best_solution)
+    return fairness_index
 
 
 topology = StaticTopology()
@@ -116,12 +121,21 @@ topology = StaticTopology()
 #     topology.print_distances()
 
 #test('random')
-#test('genetic', draw=False)
 
-for i in range(10):
-    print(f'==============={i}th trial===============')
-    test('markov', draw=False)
-    print()
-    print()
+with open('dump/genetic_large.txt', 'w') as f:
+    for i in range(10):
+        print()
+        print(f'===============genetic: {i}th trial===============')
+        fairness_index = test('genetic', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+with open('dump/markov_large.txt', 'w') as f:
+    for i in range(10):
+        print()
+        print(f'===============markov: {i}th trial===============')
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
 
 #test('optimal')
