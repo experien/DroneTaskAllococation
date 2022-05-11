@@ -50,14 +50,14 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=500000,
+                        n_generation=50000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
     },
     'markov': {
         'allocator' : RandomAllocator,
-        'evaluator' : MultihopEnergyEvaluator,
+        'evaluator' : MultihopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
             n_iteration=500,     # up to 1600 in the ref' paper.
@@ -88,6 +88,12 @@ def test(test_setting_name, draw=True):
         allocated_wf, best_score = best_solution.evaluate()
         allocated_wf = -allocated_wf
         title = f'best solution: {allocated_wf}/{global_params.NumOfWorkflows} workflows allocated, result={best_score:.3f}'
+
+        if test_setting_name == 'markov':
+            # energy fairnes index도 계산해서 출력
+            energy_evaluator = MultihopEnergyEvaluator(topology)
+            fairness_index = energy_evaluator.evaluate(best_solution)
+            print(f"      (energy) fairess idex = {fairness_index:.3f}")
     else:
         title = 'No feasible solution found'
 
@@ -110,6 +116,6 @@ topology = StaticTopology()
 #     topology.print_distances()
 
 #test('random')
-test('genetic', draw=True)
+#test('genetic', draw=True)
 test('markov', draw=True)
 #test('optimal')

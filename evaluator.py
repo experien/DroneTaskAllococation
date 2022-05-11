@@ -118,3 +118,43 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
             return e_fairness
         except ZeroDivisionError:
             return 0
+
+
+class MultihopMarkovEvaluator(Evaluator):
+    def __init__(self, topology):
+        super().__init__(topology)
+        self.metric = '(BW + proc.power)'
+
+        def evaluate(self, solution):
+            consumption = {node: 0 for node in self.topology.all_nodes}
+            #cost_proc = {node: 0 for node in self.topology.all_nodes}
+            #cost_bw = {node: 0 for node in self.topology.all_nodes}
+
+            allocated_nodes = set()
+            for wf in self.topology.workflows:
+                if solution.is_allocated(wf):
+                    for task in wf.tasks:
+                        allocated_nodes.add(solution.task_to_node[task])
+
+                    for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
+                        prev_node = solution.task_to_node[prev_task]
+                        cur_node = solution.task_to_node[cur_task]
+
+                        sum_distance = 0
+                        try:
+                            p = solution.routing_paths[(prev_node, cur_node)]
+                            for src, dst in zip(p, p[1:]):
+                                sum_distance += self.topology.get_distance(src, dst)
+                        except KeyError:
+                            pass
+
+                        consumption[prev_node] += sum_distance * prev_task.required_resources['processing_power']
+
+            return 0
+
+    def get_best(self, solutions):
+        if solutions:
+            return min(solutions, key=lambda solution:
+            (-solution.workflow_alloc_cnt, solution.evaluate()))
+        else:
+            return None
