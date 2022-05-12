@@ -146,36 +146,34 @@ super_vanilla_test_parameters = GlobalParameters(
     MaxRequiredBandwidth = 30
 )
 
-density_test_parameters = GlobalParameters(
-    # default: 30, 4, 2
-    NumOfDrones = 10,
-    NumOfEdgeServer = 4,
-    NumOfCloudServer = 2
-)
+# density_test_parameters = GlobalParameters(
+#     # default: 30, 4, 2
+#     NumOfDrones = 10,
+#     NumOfEdgeServer = 4,
+#     NumOfCloudServer = 2
+# )
 
-density_test_parameters_small = GlobalParameters(
-    DroneXRange = Range(0, 30),
-    EdgeServerXRange = Range(30, 40),
-    CloudServerXRange = Range(40, 50),
-    AreaXRange = Range(0, 50),
-    AreaYRange = Range(0, 30),
-    EdgeServerYRange = Range(0, 30),
-    CloudServerYRange = Range(0, 30),
-
-    DroneTransRange = 10,
-
-    NumOfDrones = 5,
-
-    NumOfWorkflows = 4,
-    MinRequiredProcessingPower = 40,
-    MaxRequiredProcessingPower = 80
-)
+# density_test_parameters_small = GlobalParameters(
+#     DroneXRange = Range(0, 30),
+#     EdgeServerXRange = Range(30, 40),
+#     CloudServerXRange = Range(40, 50),
+#     AreaXRange = Range(0, 50),
+#     AreaYRange = Range(0, 30),
+#     EdgeServerYRange = Range(0, 30),
+#     CloudServerYRange = Range(0, 30),
+#
+#     DroneTransRange = 10,
+#
+#     NumOfDrones = 5,
+#
+#     NumOfWorkflows = 4,
+#     MinRequiredProcessingPower = 40,
+#     MaxRequiredProcessingPower = 80
+# )
 DEBUG = False
 DEBUG_ALL_CASES = False
 
 
-#global_params = GlobalParameters()  # large
-global_params = vanilla_test_parameters  # small
+global_params = GlobalParameters()  # large
+#global_params = vanilla_test_parameters  # small
 #global_params = super_vanilla_test_parameters
-#global_params = density_test_parameters
-#global_params = density_test_parameters_small

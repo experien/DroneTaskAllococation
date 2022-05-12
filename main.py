@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=500000,
+                        n_generation=300000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=500,     # up to 1600 in the ref' paper.
+            n_iteration=300,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
@@ -123,26 +123,131 @@ topology = StaticTopology()
 #     topology.print_workflow_n_tasks()
 #     topology.print_distances()
 
+
+#test('optimal')
 #test('random')
 
-with open('dump/density_small.txt', 'w') as f:
-    for i in range(10):
+
+with open('dump/density_large_genetic.txt', 'w') as f:
+    for n_drone in range(10, 101, 10):
         print()
-        print(f'===============genetic: {i} th===============')
-        global_params.NumOfDrones = i
+        print(f'===============[DENSITY] genetic: {n_drone} Drones===============')
+        global_params = GlobalParameters()
+        global_params.NumOfDrones = n_drone
         topology = StaticTopology()  # 토폴로지 재정의
         fairness_index = test('genetic', draw=False)
         f.write(str(fairness_index) + "\n")
     f.close()
 
-# with open('dump/density_small_markov.txt', 'w') as f:
-#     for i in range(5, 55, 5):
-#         print()
-#         print(f'===============markov: {i} drones===============')
-#         global_params.NumOfDrones = i
-#         topology = StaticTopology()  # 토폴로지 재정의
-#         fairness_index = test('markov', draw=False)
-#         f.write(str(fairness_index) + "\n")
-#     f.close()
+with open('dump/density_large_markov.txt', 'w') as f:
+    for n_drone in range(10, 101, 10):
+        print()
+        print(f'===============[DENSITY] markov: {n_drone} drones===============')
+        global_params = GlobalParameters()
+        global_params.NumOfDrones = n_drone
+        topology = StaticTopology()  # 토폴로지 재정의
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
 
-#test('optimal')
+
+global_params = vanilla_test_parameters
+
+with open('dump/task_small_genetic.txt', 'w') as f:
+    for n_task in range(1, 11):
+        print()
+        print(f'===============[Tasks per Workflow] small_genetic: {n_task} Tasks===============')
+        global_params.MinTasksPerWorkFlow = 1
+        global_params.MaxTasksPerWorkflow = n_task
+        topology = StaticTopology()
+        fairness_index = test('genetic', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+
+with open('dump/task_small_markov.txt', 'w') as f:
+    for n_task in range(1, 11):
+        print()
+        print(f'===============[Tasks per Workflow] small_markov: {n_task} Tasks===============')
+        global_params.MinTasksPerWorkFlow = 1
+        global_params.MaxTasksPerWorkflow = n_task
+        topology = StaticTopology()
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+# rollback
+vanilla_test_parameters.MinTasksPerWorkflow = 4
+vanilla_test_parameters.MaxTasksPerWorkflow = 4
+
+
+global_params = GlobalParameters()
+
+with open('dump/task_large_genetic.txt', 'w') as f:
+    for n_task in range(1, 11):
+        print()
+        print(f'===============[Tasks per Workflow] large_genetic: {n_task} Tasks===============')
+        global_params.MinTasksPerWorkFlow = 1
+        global_params.MaxTasksPerWorkflow = n_task
+        topology = StaticTopology()
+        fairness_index = test('genetic', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+
+with open('dump/task_large_markov.txt', 'w') as f:
+    for n_task in range(1, 11):
+        print()
+        print(f'===============[Tasks per Workflow] large_markov: {n_task} Tasks===============')
+        global_params.MinTasksPerWorkFlow = 1
+        global_params.MaxTasksPerWorkflow = n_task
+        topology = StaticTopology()
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+
+global_params = vanilla_test_parameters
+
+with open('dump/wf_small_genetic.txt', 'w') as f:
+    for n_wf in range(1, 11):
+        print()
+        print(f'===============[No. of Workflows] small_genetic: {n_wf} workflows===============')
+        global_params.NumOfWorkflows = n_wf
+        topology = StaticTopology()
+        fairness_index = test('genetic', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+with open('dump/wf_small_markov.txt', 'w') as f:
+    for n_wf in range(1, 11):
+        print()
+        print(f'===============[No. of Workflows] small_markov: {n_wf} workflows===============')
+        global_params.NumOfWorkflows = n_wf
+        topology = StaticTopology()
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+
+global_params = GlobalParameters()
+
+with open('dump/wf_large_genetic.txt', 'w') as f:
+    for n_wf in range(5, 55, 5):
+        print()
+        print(f'===============[No. of Workflows] large_genetic: {n_wf} workflows===============')
+        global_params.NumOfWorkflows = n_wf
+        topology = StaticTopology()
+        fairness_index = test('genetic', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
+
+with open('dump/wf_large_markov.txt', 'w') as f:
+    for n_wf in range(5, 55, 5):
+        print()
+        print(f'===============[No. of Workflows] large_genetic: {n_wf} workflows===============')
+        global_params.NumOfWorkflows = n_wf
+        topology = StaticTopology()
+        fairness_index = test('markov', draw=False)
+        f.write(str(fairness_index) + "\n")
+    f.close()
