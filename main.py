@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=500,     # up to 1600 in the ref' paper.
+            n_iteration=100,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
@@ -125,13 +125,13 @@ topology = StaticTopology()
 
 #test('random')
 
-with open('dump/genetic_large.txt', 'w') as f:
-    for i in range(10):
-        print()
-        print(f'===============genetic: {i}th trial===============')
-        fairness_index = test('genetic', draw=False)
-        f.write(str(fairness_index) + "\n")
-    f.close()
+# with open('dump/genetic_large.txt', 'w') as f:
+#     for i in range(10):
+#         print()
+#         print(f'===============genetic: {i}th trial===============')
+#         fairness_index = test('genetic', draw=False)
+#         f.write(str(fairness_index) + "\n")
+#     f.close()
 
 with open('dump/markov_large.txt', 'w') as f:
     for i in range(10):

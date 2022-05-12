@@ -63,7 +63,7 @@ class EnergyEvaluator(Evaluator):
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
-                    consumption[prev_node] += self.topology.get_distance(prev_node, cur_node) ** 2 + prev_task.required_resources['processing_power']
+                    consumption[prev_node] += self.topology.get_distance(prev_node, cur_node) + prev_task.required_resources['processing_power']
 
         e_sum = sum(consumption.values())
         e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
@@ -98,15 +98,15 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
 
-                    sum_distance_sqr = 0
+                    sum_distance = 0
                     try:
                         p = solution.routing_paths[(prev_node, cur_node)]
                         for src, dst in zip(p, p[1:]):
-                            sum_distance_sqr += self.topology.get_distance(src, dst) ** 2
+                            sum_distance += self.topology.get_distance(src, dst)
                     except KeyError:
                         pass
 
-                    consumption[prev_node] += sum_distance_sqr + prev_task.required_resources['processing_power']
+                    consumption[prev_node] += sum_distance + prev_task.required_resources['processing_power']
 
         try:
             e_sum = sum(consumption.values())
