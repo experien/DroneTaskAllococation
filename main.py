@@ -95,7 +95,10 @@ def test(test_setting_name, draw=True):
             # energy fairnes index도 계산해서 출력
             energy_evaluator = MultihopEnergyEvaluator(topology)
             fairness_index = energy_evaluator.evaluate(best_solution)
-            print(f"      (energy) fairess index = {fairness_index:.3f}")
+            print(f"(energy) fairess index = {fairness_index:.3f}")
+        else:
+            _, fairness_index = best_solution.evaluate()
+            print(f"(energy) fairess index = {fairness_index:.3f}")
 
         if draw:
             Visualizer.draw(title, topology, best_solution)
