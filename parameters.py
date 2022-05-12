@@ -164,7 +164,7 @@ density_test_parameters_small = GlobalParameters(
 
     DroneTransRange = 10,
 
-    NumOfDrones = 50,
+    NumOfDrones = 5,
 
     NumOfWorkflows = 4,
     MinRequiredProcessingPower = 40,
@@ -174,8 +174,8 @@ DEBUG = False
 DEBUG_ALL_CASES = False
 
 
-global_params = GlobalParameters()
-#global_params = vanilla_test_parameters
+#global_params = GlobalParameters()  # large
+global_params = vanilla_test_parameters  # small
 #global_params = super_vanilla_test_parameters
 #global_params = density_test_parameters
 #global_params = density_test_parameters_small

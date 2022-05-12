@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=100,     # up to 1600 in the ref' paper.
+            n_iteration=500,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
@@ -125,20 +125,24 @@ topology = StaticTopology()
 
 #test('random')
 
-# with open('dump/genetic_large.txt', 'w') as f:
-#     for i in range(10):
-#         print()
-#         print(f'===============genetic: {i}th trial===============')
-#         fairness_index = test('genetic', draw=False)
-#         f.write(str(fairness_index) + "\n")
-#     f.close()
-
-with open('dump/markov_large.txt', 'w') as f:
+with open('dump/density_small.txt', 'w') as f:
     for i in range(10):
         print()
-        print(f'===============markov: {i}th trial===============')
-        fairness_index = test('markov', draw=False)
+        print(f'===============genetic: {i} th===============')
+        global_params.NumOfDrones = i
+        topology = StaticTopology()  # 토폴로지 재정의
+        fairness_index = test('genetic', draw=False)
         f.write(str(fairness_index) + "\n")
     f.close()
+
+# with open('dump/density_small_markov.txt', 'w') as f:
+#     for i in range(5, 55, 5):
+#         print()
+#         print(f'===============markov: {i} drones===============')
+#         global_params.NumOfDrones = i
+#         topology = StaticTopology()  # 토폴로지 재정의
+#         fairness_index = test('markov', draw=False)
+#         f.write(str(fairness_index) + "\n")
+#     f.close()
 
 #test('optimal')

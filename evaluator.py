@@ -67,8 +67,8 @@ class EnergyEvaluator(Evaluator):
 
         e_sum = sum(consumption.values())
         e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-        e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
-        #e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
+        #e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
+        e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
         return e_fairness
 
     def get_best(self, solutions):
