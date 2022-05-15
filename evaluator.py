@@ -45,10 +45,98 @@ class DistanceEvaluator(Evaluator):
             return None
 
 
-class EnergyEvaluator(Evaluator):
+class MultihopDistanceEvaluator(Evaluator):
     def __init__(self, topology):
         super().__init__(topology)
-        self.metric = 'Energy'
+        self.metric = 'Distance'
+
+    # sum of node-to-node distances
+    def evaluate(self, solution):
+        sum_dist = 0
+        for wf in self.topology.workflows:
+            if solution.is_allocated(wf):
+                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
+                    prev_node = solution.task_to_node[prev_task]
+                    cur_node = solution.task_to_node[cur_task]
+                    try:
+                        p = solution.routing_paths[(prev_node, cur_node)]
+                        for src, dst in zip(p, p[1:]):
+                            sum_dist += self.topology.get_distance(src, dst)
+                    except KeyError:
+                        #sum_dist += self.topology.get_distance(prev_node, cur_node)
+                        pass
+
+        return sum_dist
+
+    def get_best(self, solutions):
+        if solutions:
+            return min(solutions, key=lambda solution:
+            (-solution.workflow_alloc_cnt, solution.evaluate()))
+        else:
+            return None
+
+
+class MultihopEnergyConsumptionEvaluator(Evaluator):
+    def __init__(self, topology):
+        super().__init__(topology)
+        self.metric = 'Energy_consumption'
+
+    def evaluate(self, solution):
+        sum_consumption = 0
+        for wf in self.topology.workflows:
+            if solution.is_allocated(wf):
+                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
+                    prev_node = solution.task_to_node[prev_task]
+                    cur_node = solution.task_to_node[cur_task]
+                    sum_distance = 0
+                    try:
+                        p = solution.routing_paths[(prev_node, cur_node)]
+                        for src, dst in zip(p, p[1:]):
+                            sum_distance += self.topology.get_distance(src, dst)
+                    except KeyError:
+                        #sum_distance += self.topology.get_distance(prev_node, cur_node)
+                        pass
+
+                    sum_consumption += sum_distance + prev_task.required_resources['processing_power']
+
+        return sum_consumption
+
+    def get_best(self, solutions):
+        if solutions:
+            return min(solutions, key=lambda solution:
+            (-solution.workflow_alloc_cnt, solution.evaluate()))
+        else:
+            return None
+
+
+class EnergyConsumptionEvaluator(Evaluator):
+    def __init__(self, topology):
+        super().__init__(topology)
+        self.metric = 'Energy_consumption'
+
+    def evaluate(self, solution):
+        sum_consumption = 0
+        for wf in self.topology.workflows:
+            if solution.is_allocated(wf):
+                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
+                    prev_node = solution.task_to_node[prev_task]
+                    cur_node = solution.task_to_node[cur_task]
+                    sum_consumption += self.topology.get_distance(prev_node, cur_node) + prev_task.required_resources['processing_power']
+
+        return sum_consumption
+
+    def get_best(self, solutions):
+        if solutions:
+            return min(solutions, key=lambda solution:
+            (-solution.workflow_alloc_cnt, solution.evaluate()))
+        else:
+            return None
+
+
+class EnergyFairnessEvaluator(Evaluator):
+    def __init__(self, topology):
+        super().__init__(topology)
+        self.metric = 'Energy_fairness'
 
     def evaluate(self, solution):
         consumption = {node:0 for node in self.topology.all_nodes}
@@ -79,10 +167,10 @@ class EnergyEvaluator(Evaluator):
             return None
 
 
-class MultihopEnergyEvaluator(EnergyEvaluator):
+class MultihopEnergyFairnessEvaluator(EnergyFairnessEvaluator):
     def __init__(self, topology):
         super().__init__(topology)
-        self.metric = 'Energy'
+        self.metric = 'Energy_fairness'
 
     def evaluate(self, solution):
         consumption = {node:0 for node in self.topology.all_nodes}
@@ -104,6 +192,7 @@ class MultihopEnergyEvaluator(EnergyEvaluator):
                         for src, dst in zip(p, p[1:]):
                             sum_distance += self.topology.get_distance(src, dst)
                     except KeyError:
+                        #sum_distance += self.topology.get_distance(prev_node, cur_node)
                         pass
 
                     consumption[prev_node] += sum_distance + prev_task.required_resources['processing_power']
