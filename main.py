@@ -50,7 +50,7 @@ test_mode_settings = {
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
                         population_size=10000,
-                        n_generation=300000,
+                        n_generation=1000000,
                         #selection_ratio=0.2, // not used
                         mutation_ratio=1.0
                     )
@@ -60,7 +60,7 @@ test_mode_settings = {
         'evaluator' : MultihopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=1000,     # up to 1600 in the ref' paper.
+            n_iteration=2000,     # up to 1600 in the ref' paper.
             beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
         )
     }
@@ -129,38 +129,38 @@ topology = StaticTopology()
 #     topology.print_workflow_n_tasks()
 #     topology.print_distances()
 
-with open('dump/topology_small1.bin', 'rb') as f_in:
-    topology = pickle.load(f_in)
-
-with open('dump/consumption_small_genetic.txt', "w") as f_out:
-    for i in range(10):
-        print()
-        print(f'===============[E.consumption & distance] genetic-small: {i+1} th===============')
-        fairness, e_consumption, dist = test('genetic', draw=False)
-        print("fairness, consumption, dist =", fairness, e_consumption, dist)
-        f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-    f_out.close()
-
-with open('dump/consumption_small_markov.txt', "w") as f_out:
-    for i in range(10):
-        print()
-        print(f'===============[E.consumption & distance] markov-small: {i+1} th===============')
-        fairness, e_consumption, dist = test('markov', draw=False)
-        print("fairness, consumption, dist =", fairness, e_consumption, dist)
-        f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-    f_out.close()
+# with open('dump/topology_small1.bin', 'rb') as f_in:
+#     topology = pickle.load(f_in)
+#
+# with open('dump/consumption_small_genetic.txt', "w") as f_out:
+#     for i in range(10):
+#         print()
+#         print(f'===============[E.consumption & distance] genetic-small: {i+1} th===============')
+#         fairness, e_consumption, dist = test('genetic', draw=False)
+#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
+#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
+#     f_out.close()
+#
+# with open('dump/consumption_small_markov.txt', "w") as f_out:
+#     for i in range(10):
+#         print()
+#         print(f'===============[E.consumption & distance] markov-small: {i+1} th===============')
+#         fairness, e_consumption, dist = test('markov', draw=False)
+#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
+#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
+#     f_out.close()
 
 with open('dump/topology_large1.bin', 'rb') as f_in:
     topology = pickle.load(f_in)
 
-with open('dump/consumption_large_genetic.txt', "w") as f_out:
-    for i in range(10):
-        print()
-        print(f'===============[E.consumption & distance] genetic-large: {i+1} th===============')
-        fairness, e_consumption, dist = test('genetic', draw=False)
-        print("fairness, consumption, dist =", fairness, e_consumption, dist)
-        f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-    f_out.close()
+# with open('dump/consumption_large_genetic.txt', "w") as f_out:
+#     for i in range(10):
+#         print()
+#         print(f'===============[E.consumption & distance] genetic-large: {i+1} th===============')
+#         fairness, e_consumption, dist = test('genetic', draw=False)
+#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
+#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
+#     f_out.close()
 
 with open('dump/consumption_large_markov.txt', "w") as f_out:
     for i in range(10):

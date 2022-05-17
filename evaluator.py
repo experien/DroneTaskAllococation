@@ -63,7 +63,7 @@ class MultihopDistanceEvaluator(Evaluator):
                         for src, dst in zip(p, p[1:]):
                             sum_dist += self.topology.get_distance(src, dst)
                     except KeyError:
-                        #sum_dist += self.topology.get_distance(prev_node, cur_node)
+                        sum_dist += self.topology.get_distance(prev_node, cur_node)
                         pass
 
         return sum_dist
@@ -94,7 +94,7 @@ class MultihopEnergyConsumptionEvaluator(Evaluator):
                         for src, dst in zip(p, p[1:]):
                             sum_distance += self.topology.get_distance(src, dst)
                     except KeyError:
-                        #sum_distance += self.topology.get_distance(prev_node, cur_node)
+                        sum_distance += self.topology.get_distance(prev_node, cur_node)
                         pass
 
                     sum_consumption += sum_distance + prev_task.required_resources['processing_power']
@@ -192,7 +192,7 @@ class MultihopEnergyFairnessEvaluator(EnergyFairnessEvaluator):
                         for src, dst in zip(p, p[1:]):
                             sum_distance += self.topology.get_distance(src, dst)
                     except KeyError:
-                        #sum_distance += self.topology.get_distance(prev_node, cur_node)
+                        sum_distance += self.topology.get_distance(prev_node, cur_node)
                         pass
 
                     consumption[prev_node] += sum_distance + prev_task.required_resources['processing_power']
