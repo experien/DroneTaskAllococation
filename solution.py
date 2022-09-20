@@ -151,12 +151,10 @@ class Solution:
         return list(self.wf_to_nodes[workflow].keys())
 
     def evaluate(self):
-        #if self.require_evaluation:
-        if True:
-            self.value = self.evaluator.evaluate(self)
-            self._require_evaluation = False
+        self.value = self.evaluator.evaluate(self)
+        self._require_evaluation = False
 
-        return (-self.workflow_alloc_cnt, self.value)
+        return self.value
 
     def clone(self):
         new_solution = Solution(self.topology, self.evaluator)

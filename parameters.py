@@ -170,10 +170,11 @@ super_vanilla_test_parameters = GlobalParameters(
 #     MinRequiredProcessingPower = 40,
 #     MaxRequiredProcessingPower = 80
 # )
+
 DEBUG = False
 DEBUG_ALL_CASES = False
 
 
-global_params = GlobalParameters()  # large
-#global_params = vanilla_test_parameters  # small
+#global_params = GlobalParameters()  # large
+global_params = vanilla_test_parameters  # small
 #global_params = super_vanilla_test_parameters

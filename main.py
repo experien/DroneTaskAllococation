@@ -1,28 +1,3 @@
-# TODO List:
-#   - OPT (jhjang) - 검증 더 해보기, 가지치기
-#   - GeneticSolver (bjkim)
-#   - MA (jhjang)
-#   - 엑셀/csv 파일에 저장하고 불러오기 (파라미터, 토폴로지, 배치)
-#   - Evaluator - 에너지 모델? 거리?
-
-# # ======================================================================================================
-# import ma
-# # 일단 random chromosome 1개(Population[0])으로 시작
-# ma_record = ma.iterate(MA_MAX_ITERATION, Population[0])
-# # ma.iterate(MA_MAX_ITERATION, Population, calculate_performance_chromosome)
-#
-# print("\n[GA Performance]")
-# for x in Population:
-#     calculate_performance_chromosome(x)
-#
-# print("\n[MA Performance]")
-# for record in ma_record:
-#     print(*record, 'SUM =', sum(record))
-#
-# ma.display(ma_record)
-#
-
-
 from evaluator import *
 from allocator import *
 from solver_ga import *
@@ -34,145 +9,114 @@ from solver_ma import *
 test_mode_settings = {
     'random' : {
         'allocator' : RandomAllocator,
-        #'evaluator' : DistanceEvaluator,
-        'evaluator' : EnergyFairnessEvaluator,
+        'evaluator' : SingleHopEvaluator,
         'solver'    : SimpleSolver
     },
     'optimal': {
         'allocator' : OptimalAllocator,
-        #'evaluator' : DistanceEvaluator,
-        'evaluator' : EnergyFairnessEvaluator,
+        'evaluator' : SingleHopEvaluator,
         'solver'    : OptimalSolver
     },
     'genetic': {
         'allocator' : RandomAllocator,
-        'evaluator' : EnergyFairnessEvaluator,
+        'evaluator' : SingleHopEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
-                        population_size=10000,
-                        n_generation=1000000,
-                        #selection_ratio=0.2, // not used
+                        population_size=100,
+                        n_generation=1000,
                         mutation_ratio=1.0
+                        # selection_ratio=0.2, // not used
                     )
     },
     'markov': {
         'allocator' : RandomAllocator,
-        'evaluator' : MultihopMarkovEvaluator,
+        'evaluator' : MultiHopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-            n_iteration=2000,     # up to 1600 in the ref' paper.
-            beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
-        )
+                        n_iteration=20,     # up to 1600 in the ref' paper.
+                        beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
+                    )
     }
 }
 
 
-def test(test_setting_name, draw=True):
-    assert test_setting_name in test_mode_settings, "Invalid test name: " + test_setting_name
+class TestSet:
+    def __init__(self, toppology_gen, dump_filename, topology_print=False, topology_savefile=""):
+        assert toppology_gen in ["new", "load_small", "load_large"]
+        self.topology_gen = toppology_gen
+        self.dump_filename = dump_filename
 
-    if DEBUG:
-        print(f"\n====================[{test_setting_name}] TEST ====================")
-        print()
+        if self.topology_gen == "load_small":
+            with open('dump/topology_small1.bin', 'rb') as fin:
+                self.topology = pickle.load(fin)
+        elif self.topology_gen == "load_large":
+            with open('dump/topology_large1.bin', 'rb') as fin:
+                self.topology = pickle.load(fin)
+        else:
+            self.topology = StaticTopology()
 
-    setting = test_mode_settings[test_setting_name]
-    evaluator = setting['evaluator'](topology)
-    allocator = setting['allocator'](topology, evaluator)
+        if topology_print:
+            self.topology.print_nodes()
+            self.topology.print_workflow_n_tasks()
+            self.topology.print_distances()
 
-    if 'params' in setting:
-        solver = setting['solver'](topology, allocator, evaluator, setting['params'])
-    else:
-        solver = setting['solver'](topology, allocator, evaluator)
+        if topology_savefile != "":
+            with open('dump/' + topology_savefile, 'wb') as fout:
+                pickle.dump(self.topology, fout)
 
-    best_solution = solver.solve()
-    fairness_index = sum_energy_consumption = sum_dist = 0
+    def run(self, title, mode, n_iter=1):
+        with open('dump/' + self.dump_filename, "w") as f_out:
+            f_out.write('total_consumption, fairness_index, total_routing_path_len, average_link_distance\n')
+            for i in range(n_iter):
+                print()
+                print(f'===============TestSet {title}: {i+1} th===============')
+                evaluation = self.test(mode, draw=False)
+                print(evaluation)
+                f_out.write(str(evaluation.total_energy_consumption) + " " + \
+                            str(evaluation.fairness_index) + " " + \
+                            str(evaluation.total_distance) + \
+                            str(evaluation.average_link_distance) + "\n")
+            f_out.close()
 
-    if best_solution:
-        allocated_wf, best_score = best_solution.evaluate()
-        allocated_wf = -allocated_wf
-        title = f'best solution: {allocated_wf}/{global_params.NumOfWorkflows} workflows allocated, result={best_score:.3f}'
+    def test(self, test_setting_name, draw=True):
+        assert test_setting_name in test_mode_settings, "Invalid test name: " + test_setting_name
+
+        if DEBUG:
+            print(f"\n====================Test [{test_setting_name}] ====================")
+            print()
+
+        setting = test_mode_settings[test_setting_name]
+        evaluator = setting['evaluator'](self.topology)
+        allocator = setting['allocator'](self.topology, evaluator)
+
+        if 'params' in setting:
+            solver = setting['solver'](self.topology, allocator, evaluator, setting['params'])
+        else:
+            solver = setting['solver'](self.topology, allocator, evaluator)
+
+        best_solution = solver.solve()
+
+        if not best_solution:
+            title = 'No feasible solution found'
+            return None
 
         if test_setting_name == 'markov':
-            # energy fairnes index도 계산해서 출력
-            energy_fairness_evaluator = MultihopEnergyFairnessEvaluator(topology)
-            fairness_index = energy_fairness_evaluator.evaluate(best_solution)
-            sum_energy_consumption = MultihopEnergyConsumptionEvaluator(topology).evaluate(best_solution)
-            sum_dist = MultihopDistanceEvaluator(topology).evaluate(best_solution)
+            final_evaluator = MultiHopEvaluator(self.topology)
+        elif test_setting_name == 'genetic':
+            final_evaluator = SingleHopEvaluator(self.topology)
         else:
-            _, fairness_index = best_solution.evaluate()
-            sum_energy_consumption = EnergyConsumptionEvaluator(topology).evaluate(best_solution)
-            sum_dist = DistanceEvaluator(topology).evaluate(best_solution)
-
-        print(f"(energy) fairess index = {fairness_index:.3f}")
-        print("Total energy consumption =", sum_energy_consumption)
-        print("Total routing path length =", sum_dist)
+            final_evaluator = SingleHopEvaluator(self.topology)
 
         if draw:
-            Visualizer.draw(title, topology, best_solution)
+            Visualizer.draw('Best Solution', self.topology, best_solution)
 
-    else:
-        title = 'No feasible solution found'
-
-    return fairness_index, sum_energy_consumption, sum_dist
+        return final_evaluator.evaluate(best_solution)
 
 
-topology = StaticTopology()
-
-# Save topology to file
-# with open('dump/topology.bin', 'wb') as fout:
-#     pickle.dump(topology, fout)
-
-# Load topology from file
-# with open('dump/topology_large1.bin', 'rb') as fin:
-# with open('dump/topology_small1.bin', 'rb') as fin:
-#     topology = pickle.load(fin)
-#     topology.print_nodes()
-#     topology.print_workflow_n_tasks()
-#     topology.print_distances()
-
-# with open('dump/topology_small1.bin', 'rb') as f_in:
-#     topology = pickle.load(f_in)
-#
-# with open('dump/consumption_small_genetic.txt', "w") as f_out:
-#     for i in range(10):
-#         print()
-#         print(f'===============[E.consumption & distance] genetic-small: {i+1} th===============')
-#         fairness, e_consumption, dist = test('genetic', draw=False)
-#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
-#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-#     f_out.close()
-#
-# with open('dump/consumption_small_markov.txt', "w") as f_out:
-#     for i in range(10):
-#         print()
-#         print(f'===============[E.consumption & distance] markov-small: {i+1} th===============')
-#         fairness, e_consumption, dist = test('markov', draw=False)
-#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
-#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-#     f_out.close()
-
-with open('dump/topology_large1.bin', 'rb') as f_in:
-    topology = pickle.load(f_in)
-
-# with open('dump/consumption_large_genetic.txt', "w") as f_out:
-#     for i in range(10):
-#         print()
-#         print(f'===============[E.consumption & distance] genetic-large: {i+1} th===============')
-#         fairness, e_consumption, dist = test('genetic', draw=False)
-#         print("fairness, consumption, dist =", fairness, e_consumption, dist)
-#         f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-#     f_out.close()
-
-with open('dump/consumption_large_markov.txt', "w") as f_out:
-    for i in range(10):
-        print()
-        print(f'===============[E.consumption & distance] markov-large: {i+1} th===============')
-        fairness, e_consumption, dist = test('markov', draw=False)
-        print("fairness, consumption, dist =", fairness, e_consumption, dist)
-        f_out.write(str(e_consumption) + " " + str(dist) + "\n")
-    f_out.close()
-
-#test('optimal')
-#test('random')
+TestSet('load_small', 'genetic_small').run(title='small-genetic', mode='genetic', n_iter=3)
+TestSet('load_small', 'markov_small').run(title='small-markov', mode='markov', n_iter=3)
+#TestSet('load_large', 'genetic_large').run(title='large-genetic', mode='genetic', n_iter=10)
+#TestSet('load_large', 'markov_large').run(title='large-markov', mode='markov', n_iter=10)
 
 
 # with open('dump/density_large_genetic.txt', 'w') as f:

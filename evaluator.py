@@ -1,58 +1,107 @@
 from abc import *
 from solution import *
 from parameters import *
+from collections import defaultdict
 
 
-class Evaluator(metaclass=ABCMeta):
+class Evaluation:
+    def __init__(self, metric='distance'):
+        assert metric in ['distance', 'energy', 'fairness', 'cost']
+        self.metric = metric
+        self.total_energy_consumption = 0.0
+        self.fairness_index = 0.0
+        self.total_distance = 0.0
+        self.average_link_distance = 0.0
+        self.total_cost = 0.0  # for markov
+
+    def __repr__(self):
+        return 'energy_tot(mJ), fairness index(<1.0), pathlen_avg(m) = {:.6f}, {:.6f}, {:.6f}'.format(
+            self.total_energy_consumption,
+            self.fairness_index,
+            self.average_link_distance
+        )
+
+    @property
+    def key(self):
+        if self.metric == 'energy':
+            return self.total_energy_consumption
+        elif self.metric == 'fairness':
+            return 1-self.fairness_index
+        elif self.metric == 'cost':
+            return self.total_cost
+        else:
+            return self.total_distance
+
+    def __lt__(self, other):
+        return self.key < other.key
+
+
+class BaseEvaluator(metaclass=ABCMeta):
     # evaluates a solution using specific metrics and models
 
-    def __init__(self, topology):
+    def __init__(self, topology, metric='distance'):
         self.topology = topology
-        self.metric = 'None'
+        self.metric = metric
+
+    def get_best(self, solutions):
+        if solutions:
+            return min(solutions, key=lambda solution: (-solution.workflow_alloc_cnt, solution.evaluate()))
+        else:
+            return None
+
+    @staticmethod
+    def calc_energy(task, dist):
+        def step_func(): # uJ
+            if dist <= 60: # meter
+                return 0.056
+            else:
+                uJ = 0.056 + (dist - 60) * (0.087 - 0.062) / (500 - 60)
+                mJ = uJ * 1000
+                return mJ
+
+        # A Close Examination of Performance and Power Characteristics of 4G LTE Networks -> Table 4
+        # 가정: Bandwidth 단위가 Kbps
+        energy_consumption = task.required_resources['bandwidth'] * 438.39 # uplink, Mbps/mW (W = J/sec) -> Kbps/uJ
+        # An Accurate Measurement-Based Power COnsumption Model for LTE Uplink Transmissions -> Fig. 4
+        energy_consumption *= step_func()
+        return energy_consumption # uJ
 
     @abstractmethod
     def evaluate(self, solution):
-        return 0
-
-    @abstractmethod
-    def get_best(self, solutions):
-        return solutions[0] if solutions else None
+        return Evaluation()
 
 
-class DistanceEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Distance'
-
-    # sum of node-to-node distances
+class SingleHopEvaluator(BaseEvaluator):
     def evaluate(self, solution):
-        sum_dist = 0
+        result = Evaluation(self.metric)
+        consumptions = defaultdict(int)
+        link_cnt = 0
         for wf in self.topology.workflows:
             if solution.is_allocated(wf):
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
                     prev_node = solution.task_to_node[prev_task]
                     cur_node = solution.task_to_node[cur_task]
-                    sum_dist += self.topology.get_distance(prev_node, cur_node)
+                    dist = self.topology.get_distance(prev_node, cur_node)
+                    result.total_distance += dist
+                    link_cnt += 1
+                    consumptions[prev_node] += BaseEvaluator.calc_energy(prev_task, dist)
 
-        #dist_upper_bound = self.topology.n_all_node ** 2 * (AreaXRange[1] + AreaYRange[1])
-        return sum_dist
+        result.average_link_distance = result.total_distance / link_cnt
 
-    def get_best(self, solutions):
-        if solutions:
-            return min(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None
+        nodes, values = consumptions.keys(), consumptions.values()
+        e_sum = sum(values)
+        result.total_energy_consumption = e_sum
+
+        e_sqr_sum = sum(map(lambda x: x * x, values))
+        result.fairness_index = e_sum ** 2 / (len(nodes) * e_sqr_sum)
+        return result
 
 
-class MultihopDistanceEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Distance'
-
-    # sum of node-to-node distances
+class MultiHopEvaluator(BaseEvaluator):
     def evaluate(self, solution):
-        sum_dist = 0
+        result = Evaluation(self.metric)
+        consumptions = defaultdict(int)
+        link_cnt = 0
         for wf in self.topology.workflows:
             if solution.is_allocated(wf):
                 for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
@@ -61,156 +110,28 @@ class MultihopDistanceEvaluator(Evaluator):
                     try:
                         p = solution.routing_paths[(prev_node, cur_node)]
                         for src, dst in zip(p, p[1:]):
-                            sum_dist += self.topology.get_distance(src, dst)
+                            dist = self.topology.get_distance(src, dst)
+                            result.total_distance += dist
+                            link_cnt += 1
+                            consumptions[prev_node] += BaseEvaluator.calc_energy(prev_task, dist)
                     except KeyError:
-                        sum_dist += self.topology.get_distance(prev_node, cur_node)
+                        result.total_distance += self.topology.get_distance(prev_node, cur_node)
+                        dist = self.topology.get_distance(prev_node, cur_node)
+                        consumptions[prev_node] += BaseEvaluator.calc_energy(prev_task, dist)
+                        link_cnt += 1
                         pass
 
-        return sum_dist
+        result.average_link_distance = result.total_distance / link_cnt
+        nodes, values = consumptions.keys(), consumptions.values()
+        e_sum = sum(values)
+        result.total_energy_consumption = e_sum
 
-    def get_best(self, solutions):
-        if solutions:
-            return min(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None
-
-
-class MultihopEnergyConsumptionEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Energy_consumption'
-
-    def evaluate(self, solution):
-        sum_consumption = 0
-        for wf in self.topology.workflows:
-            if solution.is_allocated(wf):
-                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
-                    prev_node = solution.task_to_node[prev_task]
-                    cur_node = solution.task_to_node[cur_task]
-                    sum_distance = 0
-                    try:
-                        p = solution.routing_paths[(prev_node, cur_node)]
-                        for src, dst in zip(p, p[1:]):
-                            sum_distance += self.topology.get_distance(src, dst)
-                    except KeyError:
-                        sum_distance += self.topology.get_distance(prev_node, cur_node)
-                        pass
-
-                    sum_consumption += sum_distance + prev_task.required_resources['processing_power']
-
-        return sum_consumption
-
-    def get_best(self, solutions):
-        if solutions:
-            return min(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None
+        e_sqr_sum = sum(map(lambda x: x * x, values))
+        result.fairness_index = e_sum ** 2 / (len(nodes) * e_sqr_sum)
+        return result
 
 
-class EnergyConsumptionEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Energy_consumption'
-
-    def evaluate(self, solution):
-        sum_consumption = 0
-        for wf in self.topology.workflows:
-            if solution.is_allocated(wf):
-                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
-                    prev_node = solution.task_to_node[prev_task]
-                    cur_node = solution.task_to_node[cur_task]
-                    sum_consumption += self.topology.get_distance(prev_node, cur_node) + prev_task.required_resources['processing_power']
-
-        return sum_consumption
-
-    def get_best(self, solutions):
-        if solutions:
-            return min(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None
-
-
-class EnergyFairnessEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Energy_fairness'
-
-    def evaluate(self, solution):
-        consumption = {node:0 for node in self.topology.all_nodes}
-
-        allocated_nodes = set()
-        for wf in self.topology.workflows:
-            if solution.is_allocated(wf):
-
-                for task in wf.tasks:
-                    allocated_nodes.add(solution.task_to_node[task])
-
-                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
-                    prev_node = solution.task_to_node[prev_task]
-                    cur_node = solution.task_to_node[cur_task]
-                    consumption[prev_node] += self.topology.get_distance(prev_node, cur_node) + prev_task.required_resources['processing_power']
-
-        e_sum = sum(consumption.values())
-        e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-        #e_fairness = e_sum ** 2 / (self.topology.n_all_node * e_sqr_sum)
-        e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
-        return e_fairness
-
-    def get_best(self, solutions):
-        if solutions:
-            return max(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None
-
-
-class MultihopEnergyFairnessEvaluator(EnergyFairnessEvaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = 'Energy_fairness'
-
-    def evaluate(self, solution):
-        consumption = {node:0 for node in self.topology.all_nodes}
-
-        allocated_nodes = set()
-        for wf in self.topology.workflows:
-            if solution.is_allocated(wf):
-
-                for task in wf.tasks:
-                    allocated_nodes.add(solution.task_to_node[task])
-
-                for prev_task, cur_task in zip(wf.tasks, wf.tasks[1:]):
-                    prev_node = solution.task_to_node[prev_task]
-                    cur_node = solution.task_to_node[cur_task]
-
-                    sum_distance = 0
-                    try:
-                        p = solution.routing_paths[(prev_node, cur_node)]
-                        for src, dst in zip(p, p[1:]):
-                            sum_distance += self.topology.get_distance(src, dst)
-                    except KeyError:
-                        sum_distance += self.topology.get_distance(prev_node, cur_node)
-                        pass
-
-                    consumption[prev_node] += sum_distance + prev_task.required_resources['processing_power']
-
-        try:
-            e_sum = sum(consumption.values())
-            e_sqr_sum = sum(map(lambda x: x * x, consumption.values()))
-            e_fairness = e_sum ** 2 / (len(allocated_nodes) * e_sqr_sum)
-            return e_fairness
-        except ZeroDivisionError:
-            return 0
-
-
-class MultihopMarkovEvaluator(Evaluator):
-    def __init__(self, topology):
-        super().__init__(topology)
-        self.metric = '(BW + proc.power)'
-
+class MultiHopMarkovEvaluator(BaseEvaluator):
     def evaluate(self, solution):
         cost_proc = {node: 0 for node in self.topology.all_nodes}
         cost_bw = {node: 0 for node in self.topology.all_nodes}
@@ -227,14 +148,9 @@ class MultihopMarkovEvaluator(Evaluator):
                 cost_proc[node] **= 2
                 cost_bw[node] = cost_bw[node] / node.resources['bandwidth']
                 cost_bw[node] **= 2
-                cost[node] = cost_proc[node] + cost_bw[node]
+                cost[node] = cost_proc[node] + cost_bw[node] // 10 * 438.39
 
-        total_cost = sum(cost.values())
-        return total_cost
+        result = Evaluation('cost')
+        result.total_cost = sum(cost.values())
+        return result
 
-    def get_best(self, solutions):
-        if solutions:
-            return min(solutions, key=lambda solution:
-            (-solution.workflow_alloc_cnt, solution.evaluate()))
-        else:
-            return None

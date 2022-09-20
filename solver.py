@@ -1,6 +1,6 @@
 from abc import *
 
-from evaluator import Evaluator
+from evaluator import BaseEvaluator
 from parameters import *
 
 
@@ -52,21 +52,13 @@ class Solver(metaclass=ABCMeta):
         evaluations = list(map(lambda s: s.evaluate(), solutions))
         #eval_norm = self._normalize(evaluations)
 
-        print(f"[DBG] {sovler_name} summary: {len(solutions)} solutions: ")
-        #for solution, evaluation in zip(solutions, eval_norm):
-        for solution, evaluation in zip(solutions, evaluations):
-            if solution is best_solution:
-                solution.print_allocation()
+        if DEBUG:
+            print(f"[DBG] {sovler_name} summary: {len(solutions)} solutions: ")
+            for solution, evaluation in zip(solutions, evaluations):
+                if solution is best_solution:
+                    solution.print_allocation()
 
-                print("       solution, no. of allocated workflows, metric: ", self.evaluator.metric)
-                print('      solution#{}\t{:16}\t{:12.3f}'.format(
-                    solution.id, solution.workflow_alloc_cnt, evaluation[1]),
-                      '(BEST)' if solution is best_solution else '')
-
-        # for solution, evaluation in zip(solutions, eval_norm):
-        #     print('      solution#{}\t{:6}\t{:10.3f}\t{:.3f}'.format(
-        #         solution.id, solution.workflow_alloc_cnt, solution.evaluate(), evaluation),
-        #           '(BEST)' if solution is best_solution else '')
+                    print('solution#{}\t{} workflows allocated\t'.format(solution.id, solution.workflow_alloc_cnt))
 
 
 class SimpleSolver(Solver):
