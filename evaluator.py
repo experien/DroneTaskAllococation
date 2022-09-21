@@ -5,7 +5,7 @@ from collections import defaultdict
 
 
 class Evaluation:
-    def __init__(self, metric='distance'):
+    def __init__(self, metric='fairness'):
         assert metric in ['distance', 'energy', 'fairness', 'cost']
         self.metric = metric
         self.total_energy_consumption = 0.0
@@ -26,7 +26,7 @@ class Evaluation:
         if self.metric == 'energy':
             return self.total_energy_consumption
         elif self.metric == 'fairness':
-            return 1-self.fairness_index
+            return 1 - self.fairness_index
         elif self.metric == 'cost':
             return self.total_cost
         else:
@@ -39,7 +39,7 @@ class Evaluation:
 class BaseEvaluator(metaclass=ABCMeta):
     # evaluates a solution using specific metrics and models
 
-    def __init__(self, topology, metric='distance'):
+    def __init__(self, topology, metric='fairness'):
         self.topology = topology
         self.metric = metric
 
@@ -132,6 +132,9 @@ class MultiHopEvaluator(BaseEvaluator):
 
 
 class MultiHopMarkovEvaluator(BaseEvaluator):
+    def __init__(self, topology, metric='cost'):
+        super().__init__(topology, metric='cost')
+
     def evaluate(self, solution):
         cost_proc = {node: 0 for node in self.topology.all_nodes}
         cost_bw = {node: 0 for node in self.topology.all_nodes}

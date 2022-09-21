@@ -22,8 +22,8 @@ test_mode_settings = {
         'evaluator' : SingleHopEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
-                        population_size=100,
-                        n_generation=1000,
+                        population_size=10000,
+                        n_generation=1000000,
                         mutation_ratio=1.0
                         # selection_ratio=0.2, // not used
                     )
@@ -33,7 +33,7 @@ test_mode_settings = {
         'evaluator' : MultiHopMarkovEvaluator,
         'solver'    : MarkovSolver,
         'params'    : MarkovSolverParameters(
-                        n_iteration=20,     # up to 1600 in the ref' paper.
+                        n_iteration=2000,     # up to 1600 in the ref' paper.
                         beta=2000   # 1, 10, 100, 1000, 2000 in the ref' paper.
                     )
     }
@@ -113,8 +113,8 @@ class TestSet:
         return final_evaluator.evaluate(best_solution)
 
 
-TestSet('load_small', 'genetic_small').run(title='small-genetic', mode='genetic', n_iter=3)
-TestSet('load_small', 'markov_small').run(title='small-markov', mode='markov', n_iter=3)
+TestSet('load_small', 'genetic_small').run(title='small-genetic', mode='genetic', n_iter=10)
+#TestSet('load_small', 'markov_small').run(title='small-markov', mode='markov', n_iter=10)
 #TestSet('load_large', 'genetic_large').run(title='large-genetic', mode='genetic', n_iter=10)
 #TestSet('load_large', 'markov_large').run(title='large-markov', mode='markov', n_iter=10)
 
