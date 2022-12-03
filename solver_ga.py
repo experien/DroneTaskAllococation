@@ -60,6 +60,9 @@ class GeneticSolver(Solver):
             base = mother if i < cut_point else father
             prev_node = None
             for task in wf.tasks:
+                if task not in base.task_to_node:
+                    return None
+
                 target_node = base.task_to_node[task]
                 if not child.mappable(prev_node, task, target_node):
                     if not prev_node:
@@ -94,6 +97,9 @@ class GeneticSolver(Solver):
 
     def _mutate(self, chromosome):
         for wf in self.topology.workflows:
+            if wf.tasks[0] not in chromosome.task_to_node:
+                return
+
             prev_node = chromosome.task_to_node[wf.tasks[0]]
             for task in wf.tasks[1:]:
                 new_target = self._select_mappable_neighbor(chromosome, prev_node, task)

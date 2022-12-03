@@ -71,21 +71,21 @@ class GlobalParameters:
 
 
 Xlarge_test_parameters = GlobalParameters(
-    DroneXRange = Range(0, 160),
-    EdgeServerXRange = Range(160, 180),
-    CloudServerXRange = Range(180, 200),
-    AreaXRange = Range(0, 200),
-    AreaYRange = Range(0, 200),
-    EdgeServerYRange = Range(0, 200),
-    CloudServerYRange = Range(0, 200),
+    DroneXRange = Range(0, 120),
+    EdgeServerXRange = Range(120, 140),
+    CloudServerXRange = Range(140, 150),
+    AreaXRange = Range(0, 150),
+    AreaYRange = Range(0, 150),
+    EdgeServerYRange = Range(0, 150),
+    CloudServerYRange = Range(0, 150),
 
     DroneTransRange = 50,
     EdgeServerTransRange = math.inf,
     CloudServerTransRange = math.inf,
 
     NumOfDrones = 100,
-    NumOfEdgeServer = 10,
-    NumOfCloudServer = 4,
+    NumOfEdgeServer = 4,
+    NumOfCloudServer = 2,
 
     MaxProcessingRateOfDrone = 100,
     MaxProcessingRateOfEdgeServer = 500,
@@ -99,9 +99,9 @@ Xlarge_test_parameters = GlobalParameters(
     BandwidthOfEdgeServer = 400,
     BandwidthOfCloudServer = 1000,
 
-    NumOfWorkflows = 30,
+    NumOfWorkflows = 25,
     MinTasksPerWorkFlow = 4,
-    MaxTasksPerWorkflow = 8,
+    MaxTasksPerWorkflow = 6,
     MinRequiredProcessingPower = 40,
     MaxRequiredProcessingPower = 80,
     MinRequiredBandwidth = 20,

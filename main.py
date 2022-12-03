@@ -22,8 +22,8 @@ test_mode_settings = {
         'evaluator' : SingleHopEvaluator,
         'solver'    : GeneticSolver,
         'params'    : GeneticSolverParameters(
-                        population_size=10000,
-                        n_generation=100000,
+                        population_size=100000,
+                        n_generation=1000000,
                         mutation_ratio=1.0
                         # selection_ratio=0.2, // not used
                     )
@@ -118,11 +118,15 @@ class TestSet:
 
 #TestSet('load_small', 'genetic_small').run(title='small-genetic', mode='genetic', n_iter=10)
 #TestSet('load_small', 'markov_small').run(title='small-markov', mode='markov', n_iter=10)
+
 #TestSet('load_large', 'genetic_large').run(title='large-genetic', mode='genetic', n_iter=10)
 #TestSet('load_large', 'markov_large').run(title='large-markov', mode='markov', n_iter=10)
+
 #TestSet('load_large', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=10)
 #TestSet('load_large', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=10)
-TestSet('new', 'genetic_Xlarge', topology_savefile='topology_Xlarge1.bin').run(title='Xlarge-genetic', mode='genetic', n_iter=1)
+
+#TestSet('load_Xlarge', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=1)
+TestSet('load_Xlarge', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=1)
 
 
 

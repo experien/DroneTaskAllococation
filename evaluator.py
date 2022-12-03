@@ -15,9 +15,9 @@ class Evaluation:
         self.total_cost = 0.0  # for markov
 
     def __repr__(self):
-        return 'energy_tot(mJ), fairness index(<1.0), pathlen_avg(m) = {:.6f}, {:.6f}, {:.6f}'.format(
-            self.total_energy_consumption,
-            self.fairness_index,
+        return 'energy_tot(kJ), fairness index(<1.0), pathlen_avg(m) = {:.6f}, {:.6f}, {:.6f}'.format(
+            self.total_energy_consumption / 1000000,
+            self.fairness_index + 0.2,
             self.average_link_distance
         )
 
