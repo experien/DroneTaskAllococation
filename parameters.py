@@ -70,6 +70,45 @@ class GlobalParameters:
     MaxRequiredBandwidth: int = 30  # 각 태스크의 최대 대역폭 파워 (기본: 200)
 
 
+Xlarge_test_parameters = GlobalParameters(
+    DroneXRange = Range(0, 160),
+    EdgeServerXRange = Range(160, 180),
+    CloudServerXRange = Range(180, 200),
+    AreaXRange = Range(0, 200),
+    AreaYRange = Range(0, 200),
+    EdgeServerYRange = Range(0, 200),
+    CloudServerYRange = Range(0, 200),
+
+    DroneTransRange = 50,
+    EdgeServerTransRange = math.inf,
+    CloudServerTransRange = math.inf,
+
+    NumOfDrones = 100,
+    NumOfEdgeServer = 10,
+    NumOfCloudServer = 4,
+
+    MaxProcessingRateOfDrone = 100,
+    MaxProcessingRateOfEdgeServer = 500,
+    MaxProcessingRateOfCloudServer = 10000,
+
+    MaxDelayFactorOfDrone = 1,
+    MaxDelayFactorOfEdgeServer = 5,
+    MaxDelayFactorOfCloudServer = 6,
+
+    BandwidthOfDrone = 200,
+    BandwidthOfEdgeServer = 400,
+    BandwidthOfCloudServer = 1000,
+
+    NumOfWorkflows = 30,
+    MinTasksPerWorkFlow = 4,
+    MaxTasksPerWorkflow = 8,
+    MinRequiredProcessingPower = 40,
+    MaxRequiredProcessingPower = 80,
+    MinRequiredBandwidth = 20,
+    MaxRequiredBandwidth = 30
+)
+
+
 vanilla_test_parameters = GlobalParameters(
     DroneXRange = Range(0, 30),
     EdgeServerXRange = Range(30, 40),
@@ -146,35 +185,11 @@ super_vanilla_test_parameters = GlobalParameters(
     MaxRequiredBandwidth = 30
 )
 
-# density_test_parameters = GlobalParameters(
-#     # default: 30, 4, 2
-#     NumOfDrones = 10,
-#     NumOfEdgeServer = 4,
-#     NumOfCloudServer = 2
-# )
-
-# density_test_parameters_small = GlobalParameters(
-#     DroneXRange = Range(0, 30),
-#     EdgeServerXRange = Range(30, 40),
-#     CloudServerXRange = Range(40, 50),
-#     AreaXRange = Range(0, 50),
-#     AreaYRange = Range(0, 30),
-#     EdgeServerYRange = Range(0, 30),
-#     CloudServerYRange = Range(0, 30),
-#
-#     DroneTransRange = 10,
-#
-#     NumOfDrones = 5,
-#
-#     NumOfWorkflows = 4,
-#     MinRequiredProcessingPower = 40,
-#     MaxRequiredProcessingPower = 80
-# )
-
 DEBUG = False
 DEBUG_ALL_CASES = False
 
 
+global_params = Xlarge_test_parameters
 #global_params = GlobalParameters()  # large
-global_params = vanilla_test_parameters  # small
+#global_params = vanilla_test_parameters  # small
 #global_params = super_vanilla_test_parameters

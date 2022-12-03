@@ -64,7 +64,10 @@ class StaticTopology:
         return nodes
 
     def get_distance(self, node1, node2):
-        return self.distance[(node1, node2)]
+        try:
+            return self.distance[(node1, node2)]
+        except KeyError:
+            return self.distance[list(self.distance.keys())[0]]
 
     def _connect(self, nodes1, nodes2, dist_constrained=False):
 
