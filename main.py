@@ -73,12 +73,15 @@ class TestSet:
             for i in range(n_iter):
                 print()
                 print(f'===============TestSet {title}: {i+1} th===============')
-                evaluation = self.test(mode, draw=False)
-                print(evaluation)
-                f_out.write(str(evaluation.total_energy_consumption / 1000) + " " + \
-                            str(evaluation.fairness_index) + " " + \
-                            str(evaluation.total_distance) + \
-                            str(evaluation.average_link_distance) + "\n")
+                try:
+                    evaluation = self.test(mode, draw=False)
+                    print(evaluation)
+                    f_out.write(str(evaluation.total_energy_consumption / 1000) + " " + \
+                                str(evaluation.fairness_index) + " " + \
+                                str(evaluation.total_distance) + \
+                                str(evaluation.average_link_distance) + "\n")
+                except KeyError as e:
+                    print("Exception in", i+1, "th trial:", e)
             f_out.close()
 
     def test(self, test_setting_name, draw=True):
@@ -125,8 +128,8 @@ class TestSet:
 #TestSet('load_large', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=10)
 #TestSet('load_large', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=10)
 
-#TestSet('load_Xlarge', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=1)
-TestSet('load_Xlarge', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=1)
+TestSet('load_Xlarge', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=5)
+TestSet('load_Xlarge', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=9)
 
 
 
