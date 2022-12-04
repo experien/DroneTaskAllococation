@@ -79,7 +79,7 @@ Xlarge_test_parameters = GlobalParameters(
     EdgeServerYRange = Range(0, 150),
     CloudServerYRange = Range(0, 150),
 
-    DroneTransRange = 30,
+    DroneTransRange = 50,
     EdgeServerTransRange = math.inf,
     CloudServerTransRange = math.inf,
 
