@@ -1,3 +1,4 @@
+from evaluator import MultiHopEvaluator
 from solver import *
 from random import choice, random
 import math
@@ -52,9 +53,10 @@ class MarkovSolver(Solver):
             if candidate_solutions:
                 current_solution = self._select(current_solution, candidate_solutions)
 
-            if DEBUG_ALL_CASES or DEBUG and iter_cnt % (self.params.n_iteration // 10) == 0:
+            if DEBUG_ALL_CASES or DEBUG and iter_cnt % 10 == 0:
                 if candidate_solutions:
-                    print(f'[DBG] MA#{iter_cnt}: {current_solution.evaluate()}')
+                    fairness_evaluator = MultiHopEvaluator(self.topology)
+                    print(f'[DBG] MA#{iter_cnt}: {fairness_evaluator.evaluate(current_solution)}')
                 else:
                     print(f'[DBG] MA#{iter_cnt}: transition failed')
 
