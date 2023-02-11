@@ -179,8 +179,11 @@ class Solution:
         return self.evaluator.get_best([self, other]) == self
 
     def __repr__(self):
-        n_wf_alloc, metric = self.evaluate()
-        return str((-n_wf_alloc, "%.2f" % metric))
+        answer = self.evaluate()
+        if answer:
+            return str(answer)
+        else:
+            return ""
 
     def print_allocation(self):
         print(f"[DBG] Solution#{self.id}:", end=' ')

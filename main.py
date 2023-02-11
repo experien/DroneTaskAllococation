@@ -129,7 +129,8 @@ class TestSet:
 #TestSet('load_large', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=10)
 
 #TestSet('load_Xlarge', 'genetic_Xlarge').run(title='Xlarge-genetic', mode='genetic', n_iter=3)
-TestSet('load_Xlarge', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=5)
+#TestSet('load_Xlarge', 'markov_Xlarge').run(title='Xlarge-markov', mode='markov', n_iter=5)
+TestSet('new', 'genetic_large').run(title='large-genetic', mode='genetic', n_iter=1)
 
 
 # with open('dump/wf_large_markov.txt', 'w') as f:

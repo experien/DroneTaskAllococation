@@ -42,8 +42,12 @@ class GeneticSolver(Solver):
                 self._mutate(choice(self.population))
 
             if DEBUG:
-                if n_iter % len(self.population) == 0:
-                    print(n_iter, "th iteration:", self.evaluator.get_best(self.population))
+                if n_iter in [0, 10, 100, 1000] or n_iter % len(self.population) == 0:
+                    answer = self.evaluator.get_best(self.population)
+                    if answer:
+                        print(n_iter, "th iteration:", self.evaluator.get_best(self.population))
+                    else:
+                        print(n_iter, "th iteration: no solution")
 
             n_iter += 1
 
